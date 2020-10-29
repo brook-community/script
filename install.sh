@@ -6,7 +6,8 @@ get_protocol(){
 2. brook ws
 3. brook wss
 4. socks5" && echo
-    echo "Select a protocol[1-4]" && echo "選擇一個協定[1-4]"
+    echo "Select a protocol[1-4]"
+    echo "選擇一個協定[1-4]"
     read -e -p "-> " protocol
     case "$protocol" in 
         [1-4])
@@ -19,19 +20,28 @@ get_protocol(){
     esac
 }
 
+get_username(){
+    echo "Input the username(optional)"
+    echo "輸入一個用戶名（如果不需要可以不寫）"
+    read -e -p "-> " username
+    [[ "$username" ]] && echo && get_password
+}
+
 get_password(){
-    echo "Input the password" && echo "輸入一個密碼"
+    echo "Input the password"
+    echo "輸入一個密碼"
     read -e -p "-> " password
-    [ -z "$password" ] && echo "Invalid password!!!" && echo && get_password
+    [[ -z "$password" ]] && echo "Invalid password!!!" && echo && get_password
     echo
 }
 
 get_port(){
-    echo "Select a port[1025-65535]" && echo "選擇一個端口[1025-65535]"
+    echo "Select a port[1025-65535]"
+    echo "選擇一個端口[1025-65535]"
     read -e -p "-> " port
     case $port in
     1[1-9][0-9][0-9] | 10[3-9][0-9] | 102[5-9] | [2-9][0-9][0-9][0-9] | [1-5][0-9][0-9][0-9][0-9] | 6[0-4][0-9][0-9][0-9] | 65[0-4][0-9][0-9] | 655[0-3][0-5])    
-        clear
+        echo
         ;;
     *)
         clear
@@ -43,9 +53,10 @@ get_port(){
 
 get_domain(){
     port = 443
-    echo "Input a domain(eg. www.google.com)" && echo "輸入一個域名(例如 www.google.com)"
+    echo "Input a domain(eg. www.google.com)"
+    echo "輸入一個域名(例如 www.google.com)"
     read -e -p "-> " domain
-    [ -z "$domain" ] && echo "Invalid domain!!!" && echo && get_domain || clear
+    [[ -z "$domain" ]] && echo "Invalid domain!!!" && echo && get_domain || clear
     echo "Make sure $domain -> $ip"
     echo "請確保 $domain -> $ip"
 }
@@ -64,7 +75,7 @@ get_ip() {
 
 install_nami(){
     curl -sL https://git.io/getnami | bash > /dev/null 2>&1 && sleep 6 && export PATH=$HOME/.nami/bin:$PATH && clear
-    if not command -v nami > /dev/null 2>&1;
+    if [[ ! $(command -v nami) ]];
     then
         clear
         echo "Fail to install nami"
@@ -74,28 +85,32 @@ install_nami(){
 }
 
 install_joker(){
-    nami install github.com/txthinking/joker && echo
-    if not command -v joker > /dev/null 2>&1;
+    nami install github.com/txthinking/joker && clear
+    if [[ ! $(command -v joker) ]];
     then
         clear
-        echo "Fail to install joker" && echo "安裝joker時出錯"
+        echo "Fail to install joker"
+        echo "安裝joker時出錯"
         exit 1
     fi
 }
 
 install_brook(){
-    nami install github.com/txthinking/brook && echo
-    if not command -v brook > /dev/null 2>&1;
+    nami install github.com/txthinking/brook && clear
+    if [[ ! $(command -v brook) ]];
     then
         clear
-        echo "Fail to install brook" && echo "安裝brook時出錯"
+        echo "Fail to install brook"
+        echo "安裝brook時出錯"
         exit 1
     fi
 }
 
 welcome(){
-    clear && echo "Version: v20201029"
-    echo "Please wait..." && echo "請耐心等待。。。"
+    clear
+    echo "Version: v20201030"
+    echo "Please wait..."
+    echo "請耐心等待。。。"
 }
 
 check_root(){
@@ -112,31 +127,46 @@ run_brook(){
     case "$protocol" in 
     1)
         get_port
+        get_password
+        clear
         joker brook server -l :$port -p $password
         link=$(brook link -s $ip:$port -p $password)
         server=$ip:$port
-	brook qr -s $ip:$port -p $password
+        brook qr -s $ip:$port -p $password
         ;;
     2)
         get_port
+        get_password
+        clear
         joker brook wsserver -l :$port -p $password
         link=$(brook link -s ws://$ip:$port -p $password)
-	brook qr -s ws://$ip:$port -p $password
+        brook qr -s ws://$ip:$port -p $password
         server=ws://$ip:$port
         ;;
     3)
         check_root
         get_domain
+        get_password
+        clear
         joker brook wsserver --domain $domain -p $password
         link=$(brook link -s wss://$domain:443/ws -p $password)
-	brook qr -s wss://$domain:443/ws -p $password
+        brook qr -s wss://$domain:443/ws -p $password
         server=wss://$domain:443
         ;;
     4)
         get_port
-        joker brook socks5 --socks5 $ip:$port
-        link=$(brook link -s socks5://$ip:$port)
-	brook qr -s socks5://$ip:$port
+        get_username
+        clear
+        if [[ -z "$username" ]];
+        then
+            joker brook socks5 --socks5 $ip:$port
+            link=$(brook link -s socks5://$ip:$port)
+            brook qr -s socks5://$ip:$port
+        else
+            joker brook socks5 --socks5 $ip:$port --username $username --password $password
+            link=$(brook link -s socks5://$ip:$port --username $username --password $password)
+            brook qr -s socks5://$ip:$port --username $username --password $password
+        fi
         server=$ip:$port
         ;;
     esac
@@ -146,14 +176,14 @@ show_status(){
     echo
     echo "link     --> $link"
     echo "server   --> $server"
-    echo "password --> $password"
+    [[ "$username" ]] && echo "username --> $username"
+    [[ "$password" ]] && echo "password --> $password"
     echo
 }
 
 welcome
 install
 get_protocol
-get_password
 get_ip
 run_brook
 show_status
