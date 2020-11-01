@@ -35,7 +35,7 @@ get_password(){
     echo
 }
 
-get_port(){
+get_port(){ #TODO: 檢查port是否被佔用
     echo "Select a port[1025-65535]"
     echo "选择一个端口[1025-65535]"
     read -e -p "-> " port
@@ -54,7 +54,7 @@ get_port(){
 get_domain(){
     port = 443
     echo "Input a domain(eg. www.google.com)"
-    echo "输入一个域名(例如 www.google.com)"
+    echo "输入一个域名(例如 www.google.com)" #TODO: 沒有域名
     read -e -p "-> " domain
     [[ -z "$domain" ]] && echo "Invalid domain!!!" && echo && get_domain || clear
     echo "Make sure $domain -> $ip"
@@ -70,7 +70,7 @@ get_ip() {
 	[[ -z $ip ]] && ip=$(curl -s https://api.myip.com | grep -oE "([0-9]{1,3}\.){3}[0-9]{1,3}")
 	[[ -z $ip ]] && ip=$(curl -s icanhazip.com)
 	[[ -z $ip ]] && ip=$(curl -s myip.ipip.net | grep -oE "([0-9]{1,3}\.){3}[0-9]{1,3}")
-	[[ -z $ip ]] && echo "Sorry I can get your server's ip address" && echo "不好意思，无法取得伺服器ip" && exit 1
+	[[ -z $ip ]] && echo "Sorry I can get your server's ip address" && echo "不好意思，无法取得服务器ip" && exit 1
 }
 
 install_nami(){
@@ -108,7 +108,7 @@ install_brook(){
 
 welcome(){
     clear
-    echo "Version: v20201031"
+    echo "Version: v20201101"
     echo "Please wait..."
     echo "请耐心等待。。。"
 }
@@ -135,8 +135,8 @@ run_brook(){
         brook qr -s $ip:$port -p $password
         ;;
     2)
-        get_port
-        get_password
+        [[ "$port" ]] || get_port
+        [[ "$password" ]] || get_password
         clear
         joker brook wsserver -l :$port -p $password
         link=$(brook link -s ws://$ip:$port -p $password)
@@ -181,10 +181,22 @@ show_status(){
     echo
 }
 
-export LC_ALL=zh_CN.UTF-8
+
+protocol=''
+port=''
+password=''
+username=''
+if [[ "$1" == "-auto" ]]; # bash <(curl -sL https://brook-community.github.io/script/install.sh) -auto
+then
+	port=$(LC_CTYPE=C tr -dc '2-9' < /dev/urandom | head -c 4) #生成隨機port -> 2222-9999
+	protocol=2 #指定使用 -> brook ws
+	password=$(LC_CTYPE=C tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 12) #生成隨機12位密碼
+fi
+
+export LC_ALL=C.UTF-8 #TODO: 解決中文顯示問題
+get_ip
 welcome
 install
-get_protocol
-get_ip
+[[ "$protocol" ]] || get_protocol
 run_brook
 show_status
