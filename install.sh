@@ -108,7 +108,7 @@ install_brook(){
 
 welcome(){
     clear
-    echo "Version: v20201101"
+    echo "Version: v20201104"
     echo "Please wait..."
     echo "请耐心等待。。。"
 }
@@ -126,13 +126,13 @@ install(){
 run_brook(){
     case "$protocol" in 
     1)
-        get_port
-        get_password
+        [[ "$port" ]] || get_port
+        [[ "$password" ]] || get_password
         clear
         joker brook server -l :$port -p $password
         link=$(brook link -s $ip:$port -p $password)
-        server=$ip:$port
         brook qr -s $ip:$port -p $password
+        server=$ip:$port
         ;;
     2)
         [[ "$port" ]] || get_port
@@ -186,14 +186,22 @@ protocol=''
 port=''
 password=''
 username=''
-if [[ "$1" == "-auto" ]]; # bash <(curl -sL https://brook-community.github.io/script/install.sh) -auto
-then
-	port=$(LC_CTYPE=C tr -dc '2-9' < /dev/urandom | head -c 4) #生成隨機port -> 2222-9999
-	protocol=2 #指定使用 -> brook ws
-	password=$(LC_CTYPE=C tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 12) #生成隨機12位密碼
-fi
 
-export LC_ALL=C.UTF-8 #TODO: 解決中文顯示問題
+case "$1" in
+    "--brook-server") #自動安裝 -> brook server
+        echo $1
+        protocol=1 #指定使用 -> brook server
+        port=$(LC_CTYPE=C tr -dc '2-9' < /dev/urandom | head -c 4) #生成隨機port -> 2222-9999
+        password=$(LC_CTYPE=C tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 12) #生成隨機12位密碼
+        ;;
+    "--brook-wsserver") #自動安裝 -> brook wsserver
+        echo $1
+        protocol=2 #指定使用 -> brook ws server
+        port=$(LC_CTYPE=C tr -dc '2-9' < /dev/urandom | head -c 4) #生成隨機port -> 2222-9999
+        password=$(LC_CTYPE=C tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 12) #生成隨機12位密碼
+        ;;
+esac
+
 get_ip
 welcome
 install
