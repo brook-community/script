@@ -108,7 +108,7 @@ install_brook(){
 
 welcome(){
     clear
-    echo "Version: v20201104"
+    echo "Version: v20201107"
     echo "Please wait..."
     echo "请耐心等待。。。"
 }
@@ -187,15 +187,20 @@ port=''
 password=''
 username=''
 
+welcome
+install
+
 case "$1" in
+    "--install-only") #只安裝 nami brook 和 joker
+        echo "Brook has been installed successfully!"
+        exit 0
+        ;;
     "--brook-server") #自動安裝 -> brook server
-        echo $1
         protocol=1 #指定使用 -> brook server
         port=$(LC_CTYPE=C tr -dc '2-9' < /dev/urandom | head -c 4) #生成隨機port -> 2222-9999
         password=$(LC_CTYPE=C tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 12) #生成隨機12位密碼
         ;;
     "--brook-wsserver") #自動安裝 -> brook wsserver
-        echo $1
         protocol=2 #指定使用 -> brook ws server
         port=$(LC_CTYPE=C tr -dc '2-9' < /dev/urandom | head -c 4) #生成隨機port -> 2222-9999
         password=$(LC_CTYPE=C tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 12) #生成隨機12位密碼
@@ -203,8 +208,6 @@ case "$1" in
 esac
 
 get_ip
-welcome
-install
 [[ "$protocol" ]] || get_protocol
 run_brook
 show_status
