@@ -1,51 +1,130 @@
-<html>
-	<head>
-		<title>Brook一键脚本生成器</title>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
-		<script src="https://cdn.jsdelivr.net/npm/weightless@0.0.37/umd/weightless.min.js"></script>
-	</head>
-	<body style="margin:0;width:100%;height:100vh;background-color:#ffffff;color:#000000;display:flex;flex-direction:row;justify-content: space-between;">
-		<div style="padding:30px 0px 0px 30px;">
-            <a href="https://github.com/brook-community/scripts" style="text-decoration-line:none;"><wl-button flat inverted style="color:#000000;">Brook一键脚本生成器</wl-button></a>
+<!doctype html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Brook</title>
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+
+        .github-disp {
+            display: none;
+        }
+
+        @media (min-width: 1200px) {
+            .github-disp {
+                display: block;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light rounded">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar1"
+            aria-controls="navbar1" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse justify-content-md-center" id="navbar1">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="https://github.com/txthinking/brook/releases">Brook下载地址</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="script" data-toggle="dropdown" aria-haspopup="true"
+                        aria-expanded="false">一键脚本</a>
+                    <div class="dropdown-menu" aria-labelledby="script">
+                        <a class="dropdown-item"
+                            onclick="document.getElementById('cmd').innerText='bash <(curl -sL https://git.io/brook.sh) --brook-wsserver'"
+                            href="#">一键搭建Brook ws server</a>
+                        <a class="dropdown-item"
+                            onclick="document.getElementById('cmd').innerText='bash <(curl -sL https://git.io/brook.sh) --brook-server'"
+                            href="#">一键搭建Brook server</a>
+                        <a class="dropdown-item"
+                            onclick="alert('Not available\nComing soon')"
+                            href="#">一键搭建Socks5</a>
+                        <a class="dropdown-item"
+                            onclick="document.getElementById('cmd').innerText='bash <(curl -sL https://git.io/brook.sh) --install-only'"
+                            href="#">一键安装Brook</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="alert('Not available\nComing soon')">English</a>
+                </li>
+            </ul>
         </div>
-		<div style="width:100%;padding-top:100px;display:flex;flex-direction:column;align-items:center;">
-            <wl-select id="command" required label="选择要部署的brook子命令" outlined style="width:600px;">
-                <option disabled selected value>请选择</option>
-                <option value="server">brook server</option>
-                <option value="wsserver">brook wsserver</option>
-            </wl-select>
-			<wl-textfield id="port" type="number" min="0" max="65535" required label="要使用的端口 (确保没被其他程序占用及防火墙开放了此端口的TCP和UDP)" style="--input-label-color:#000000;--input-color:#000000;width:600px;"></wl-textfield>
-			<wl-textfield id="password" required label="要设置的密码 (不要太简单, 也不必太复杂免得使用的时候输入麻烦)" style="--input-label-color:#000000;--input-color:#000000;width:600px;"></wl-textfield>
-			<wl-button flat inverted outlined style="color:#000000;margin-top:30px;" id="make">生成</wl-button>
-            <div style="margin-top:30px;color:#919191;">强烈建议使用<span style="color:#ff0000;">ubuntu</span>系统, 每次运行前<span style="color:#ff0000;">重启</span>一下服务器, 然后使用<span style="color:#ff0000;">root</span>用户, 复制以下粘贴回车即可</div>
-			<wl-textfield id="out" label="一键安装/更新/启动脚本" style="--input-label-color:#000000;--input-color:#000000;width:600px;margin-top:30px;"></wl-textfield>
-            <div style="margin-top:30px;color:#919191;">本脚本的目的是: 重启, 复制粘贴, 回车. 如果你想更精细的操作请查看<a href="https://txthinking.github.io/brook">文档</a>, 以上命令只是对文档上命令的合并</div>
-		</div>
-		<div style="padding:30px 30px 0px 0px;">
-            <a href="https://github.com/txthinking/brook" style="text-decoration-line:none;"><wl-button flat inverted style="color:#000000;">Github</wl-button></a>
+    </nav>
+
+    <main role="main">
+        <div class="jumbotron">
+            <div class="container">
+                <h4 class="text-center" style="color: rgb(128, 128, 128);">复制以下命令到Linux命令行</h4>
+                <br>
+                <br>
+                <p class="text-center" style="font-size: 24px;color: rgb(108, 108, 108);" id="cmd">
+                    bash <(curl -sL https://git.io/brook.sh) </p>
+                        <br id="br1">
+                        <br id="br2">
+                        <p class="text-center"><a class="btn"
+                                style="color: rgb(128, 128, 128);border-color:rgb(128, 128, 128);" href="#"
+                                role="button" id="btn_cmd"
+                                onclick="navigator.clipboard.writeText(document.getElementById('cmd').innerText);">点击复制</a>
+                        </p>
+            </div>
         </div>
-		<script>
-            document.querySelector('#make').addEventListener('click', async e=>{
-                if(!document.querySelector('#command').value){
-                    alert('你忘了选择子命令了');
-                    return;
-                }
-                if(!document.querySelector('#port').value || document.querySelector('#port').value == 0){
-                    alert('你忘了端口了');
-                    return;
-                }
-                if(!document.querySelector('#password').value){
-                    alert('你忘了密码了');
-                    return;
-                }
-                var s = `curl -L https://git.io/getnami | bash && sleep 6 && export PATH=$HOME/.nami/bin:$PATH`;
-                s += ` && nami install github.com/txthinking/joker && nami install github.com/txthinking/brook`;
-                s += ` && joker brook ${document.querySelector('#command').value} -l :${document.querySelector('#port').value} -p '${document.querySelector('#password').value}'`;
-                s += ` && sleep 3 && joker list`;
-                document.querySelector('#out').value = s;
-            });
-		</script>
-	</body>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    <h4>联络方式</h4>
+                    <br>
+                    <p><a href="https://t.me/brookchannel" target="_blank">Telegram Channel</a></p>
+                    <p><a href="https://t.me/brookgroup" target="_blank">Telegram Group</a></p>
+                    <p><a href="https://txthinking.github.io/brook/" target="_blank">Documentation</a></p>
+                </div>
+                <div class="col-md-3">
+                    <h4><br></h4>
+                    <br>
+                    <p><a href="https://www.youtube.com/channel/UC5j8-I5Y4lWo4KTa4_0Kx5A" target="_blank">YouTube
+                            Channel</a></p>
+                    <p><a href="https://talks.txthinking.com/" target="_blank">TxThinking's talks</a></p>
+                    <p><a href="https://github.com/txthinking/brook/issues" target="_blank">Report a bug</a></p>
+                </div>
+                <img class="github-disp"
+                    src="https://github-readme-stats.mrdulin.vercel.app/api?username=txthinking&show_icons=true&hide_border=true&icon_color=585858&title_color=585858">
+                <hr>
+            </div>
+    </main>
+
+    <footer class="container">
+        <p>&copy; TxThinking 2017-2020</p>
+    </footer>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+        window.onload = function load() {
+            if (!navigator.clipboard) {
+                document.getElementById("br1").style = "display: none"
+                document.getElementById("br2").style = "display: none"
+                document.getElementById("btn_cmd").style = "display: none"
+            }
+        }
+    </script>
+
 </html>
