@@ -36,11 +36,11 @@ get_password(){
 }
 
 get_port(){ #TODO: 檢查port是否被佔用
-    echo "Select a port[1025-65535]"
-    echo "选择一个端口[1025-65535]"
+    echo "Select a port[1024-65535]"
+    echo "选择一个端口[1024-65535]"
     read -e -p "-> " port
     case $port in
-    1[1-9][0-9][0-9] | 10[3-9][0-9] | 102[5-9] | [2-9][0-9][0-9][0-9] | [1-5][0-9][0-9][0-9][0-9] | 6[0-4][0-9][0-9][0-9] | 65[0-4][0-9][0-9] | 655[0-3][0-5])    
+    1[1-9][0-9][0-9] | 10[3-9][0-9] | 102[4-9] | [2-9][0-9][0-9][0-9] | [1-5][0-9][0-9][0-9][0-9] | 6[0-4][0-9][0-9][0-9] | 65[0-4][0-9][0-9] | 655[0-3][0-5])    
         echo
         ;;
     *)
@@ -108,7 +108,7 @@ install_brook(){
 
 welcome(){
     clear
-    echo "Version: v20201107"
+    echo "Version: v20210221"
     echo "Please wait..."
     echo "请耐心等待。。。"
 }
@@ -148,7 +148,7 @@ run_brook(){
         get_domain
         get_password
         clear
-        joker brook wsserver --domain $domain -p $password
+        joker brook wssserver --domain $domain -p $password
         link=$(brook link -s wss://$domain:443/ws -p $password)
         brook qr -s wss://$domain:443/ws -p $password
         server=wss://$domain:443
