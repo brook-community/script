@@ -1,140 +1,493 @@
-<!doctype html>
-
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="icon"
-        href="https://camo.githubusercontent.com/d6bb2b9b0e20cd38118a395200eecca3629f1a44/68747470733a2f2f74787468696e6b696e672e6769746875622e696f2f62726f6f6b2f5f7374617469632f62726f6f6b2e706e67"
-        type="image/x-icon" />
-    <title>Brook</title>
-    <style>
-        .bd-placeholder-img {
-            font-size: 1.125rem;
-            text-anchor: middle;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-
-        @media (min-width: 768px) {
-            .bd-placeholder-img-lg {
-                font-size: 3.5rem;
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+        <title>Brook installation script -- by Brook Community</title>
+        <script src="https://cdn.jsdelivr.net/npm/weightless@0.0.37/umd/weightless.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js"></script>
+        <style>
+			body{
+				margin:0;
+				display: flex;
+				min-height: 100vh;
+				flex-direction: column;
+			}
+			wl-nav{
+				--nav-bg:black;
+				--nav-color:white;
+			}
+			a,a:link,a:visited,a:hover,a:active{
+				color:inherit;
+			}
+            wl-button {
+                --button-color: white;
+                --button-bg: black;
             }
-        }
-
-        .github-disp {
-            display: none;
-        }
-
-        @media (min-width: 1200px) {
-            .github-disp {
-                display: block;
+            wl-card{
+                padding: 20px;
             }
-        }
-    </style>
-</head>
-
-<body>
-    <div style="text-align: center;" id="preview">
-        <p>复制以下命令到Linux命令行<br><br>bash <(curl -sL https://git.io/brook.sh)</p>
-    </div>
-    <div id="done" style="display: none;">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light rounded">
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar1"
-                aria-controls="navbar1" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse justify-content-md-center" id="navbar1">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="https://github.com/txthinking/brook/releases">Brook下载地址</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="script" data-toggle="dropdown"
-                            aria-haspopup="true" aria-expanded="false">一键脚本</a>
-                        <div class="dropdown-menu" aria-labelledby="script">
-                            <a class="dropdown-item"
-                                onclick="document.getElementById('cmd').innerText='bash <(curl -sL https://git.io/brook.sh) --brook-wsserver';document.getElementById('btn_copy').innerText='点击复制'"
-                                href="#">一键搭建Brook ws server</a>
-                            <a class="dropdown-item"
-                                onclick="document.getElementById('cmd').innerText='bash <(curl -sL https://git.io/brook.sh) --brook-server';document.getElementById('btn_copy').innerText='点击复制'"
-                                href="#">一键搭建Brook server</a>
-                            <a class="dropdown-item"
-                                onclick="document.getElementById('cmd').innerText='bash <(curl -sL https://git.io/brook.sh) --socks5';document.getElementById('btn_copy').innerText='点击复制'"
-                                href="#">一键搭建Socks5 server</a>
-                            <a class="dropdown-item"
-                                onclick="document.getElementById('cmd').innerText='bash <(curl -sL https://git.io/brook.sh) --install-only';document.getElementById('btn_copy').innerText='点击复制'"
-                                href="#">只安装Joker和Brook</a>
-                        </div>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="index_en.html">English</a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-
-        <main role="main">
-            <div class="jumbotron">
-                <div class="container">
-                    <h4 class="text-center" style="color: rgb(128, 128, 128);">复制以下命令到Linux命令行</h4>
-                    <br>
-                    <br>
-                    <p class="text-center" style="font-size: 24px;color: rgb(108, 108, 108);" id="cmd">
-                        bash <(curl -sL https://git.io/brook.sh) </p>
-                            <br id="br1">
-                            <br id="br2">
-                            <p class="text-center"><a class="btn"
-                                    style="color: rgb(128, 128, 128);border-color:rgb(128, 128, 128);" href="#copied"
-                                    role="button" id="btn_copy"
-                                    onclick="navigator.clipboard.writeText(document.getElementById('cmd').innerText);this.innerText='复制成功'">点击复制</a>
-                            </p>
-                </div>
-            </div>
-
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-3">
-                        <h4>联络方式</h4>
-                        <br>
-                        <p><a href="https://t.me/brookchannel" target="_blank">Telegram Channel</a></p>
-                        <p><a href="https://t.me/brookgroup" target="_blank">Telegram Group</a></p>
-                        <p><a href="https://txthinking.github.io/brook/" target="_blank">Documentation</a></p>
-                    </div>
-                    <div class="col-md-3">
-                        <h4><br></h4>
-                        <br>
-                        <p><a href="https://www.youtube.com/channel/UC5j8-I5Y4lWo4KTa4_0Kx5A" target="_blank">YouTube
-                                Channel</a></p>
-                        <p><a href="https://talks.txthinking.com/" target="_blank">TxThinking's talks</a></p>
-                        <p><a href="https://github.com/txthinking/brook/issues" target="_blank">Report a bug</a></p>
-                    </div>
-                    <img class="github-disp"
-                        src="https://github-readme-stats.mrdulin.vercel.app/api?username=txthinking&show_icons=true&hide_border=true&icon_color=585858&title_color=585858">
-                    <hr>
-                </div>
-        </main>
-        <footer class="container">
-            <p>&copy; TxThinking 2017-2020</p>
-        </footer>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-        <script type="text/javascript">
-            window.onload = function load() {
-                document.getElementById("preview").style = "display: none"
-                document.getElementById("done").style = "display: blank"
-                if (!navigator.clipboard) {
-                    document.getElementById("br1").style = "display: none"
-                    document.getElementById("br2").style = "display: none"
-                    document.getElementById("btn_copy").style = "display: none"
+            wl-switch{
+                --switch-color-checked:black;
+            }
+            wl-tab-group{
+                --tab-group-indicator-bg:black;
+            }
+            wl-tab{
+                --tab-color:black;
+                --tab-color-active:black;
+            }
+			pre {
+				font-family: "Courier 10 Pitch", Courier, monospace;
+				font-size: 95%;
+				line-height: 140%;
+				white-space: pre;
+				white-space: pre-wrap;
+				white-space: -moz-pre-wrap;
+				white-space: -o-pre-wrap;
+			}
+			code {
+				font-family: Monaco, Consolas, "Andale Mono", "DejaVu Sans Mono", monospace;
+				font-size: 95%;
+				line-height: 140%;
+				white-space: pre;
+				white-space: pre-wrap;
+				white-space: -moz-pre-wrap;
+				white-space: -o-pre-wrap;
+				background: #faf8f0;
+				display: block;
+				padding: 0.5em 1em;
+				border: 1px solid #bebab0;
+			}
+        </style>
+        <script>
+            var changelang = lang => {
+				document.querySelector(`#en_flex`).style.display='none';
+				document.querySelector(`#zh_flex`).style.display='none';
+				document.querySelector(`#en_nav`).style.display='none';
+				document.querySelector(`#zh_nav`).style.display='none';
+				document.querySelector(`#en_footer_flex`).style.display='none';
+				document.querySelector(`#zh_footer_flex`).style.display='none';
+				document.querySelector(`#${lang}_flex`).style.display='flex';
+				document.querySelector(`#${lang}_nav`).style.display='block';
+				document.querySelector(`#${lang}_footer_flex`).style.display='flex';
+			};
+            var changei = (lang, s) => {
+				document.querySelector(`#${lang}_ni_block`).style.display='none';
+				document.querySelector(`#${lang}_i_block`).style.display='none';
+				document.querySelector(`#${lang}_${s}_block`).style.display='block';
+			};
+            var select = lang => {
+                var kind = document.querySelector(`#${lang}_select`).value;
+				document.querySelector(`#${lang}_server_flex`).style.display='none';
+				document.querySelector(`#${lang}_wsserver_flex`).style.display='none';
+				document.querySelector(`#${lang}_wssserver_flex`).style.display='none';
+				document.querySelector(`#${lang}_socks5_flex`).style.display='none';
+				document.querySelector(`#${lang}_${kind}_flex`).style.display='flex';
+            };
+            var iselect = lang => {
+                var kind = document.querySelector(`#${lang}_i_select`).value;
+				if(kind == 'server'){
+					document.querySelector(`#${lang}_i_code`).innerText = "bash <(curl -sL https://git.io/brook.sh) --brook-server";
+					document.querySelector(`#${lang}_i_copy`).setAttribute('data-clipboard-text', "bash <(curl -sL https://git.io/brook.sh) --brook-server");
+				}
+				if(kind == 'wsserver'){
+					document.querySelector(`#${lang}_i_code`).innerText = "bash <(curl -sL https://git.io/brook.sh) --brook-wsserver";
+					document.querySelector(`#${lang}_i_copy`).setAttribute('data-clipboard-text', "bash <(curl -sL https://git.io/brook.sh) --brook-wsserver");
+				}
+				if(kind == 'socks5'){
+					document.querySelector(`#${lang}_i_code`).innerText = "bash <(curl -sL https://git.io/brook.sh) --socks5";
+					document.querySelector(`#${lang}_i_copy`).setAttribute('data-clipboard-text', "bash <(curl -sL https://git.io/brook.sh) --socks5");
+				}
+				if(kind == 'jokerbrook'){
+					document.querySelector(`#${lang}_i_code`).innerText = "bash <(curl -sL https://git.io/brook.sh) --install-only";
+					document.querySelector(`#${lang}_i_copy`).setAttribute('data-clipboard-text', "bash <(curl -sL https://git.io/brook.sh) --install-only");
+				}
+            };
+            var generate = lang => {
+                var kind = document.querySelector(`#${lang}_select`).value;
+                var serverport = '';
+                var serverpassword = '';
+                var wsserverport = '';
+                var wsserverpassword = '';
+                var wssserverdomain = '';
+                var wssserverpassword = '';
+                var socks5port = '';
+                var socks5username = '';
+                var socks5password = '';
+                if(kind == 'server'){
+                    serverport = parseInt(document.querySelector(`#${lang}_${kind}_port`).value.trim()).toString();
+                    if(serverport == "NaN"){
+                        alert('port should be a number. port应该是数字');
+                        return;
+                    }
+                    serverpassword = document.querySelector(`#${lang}_${kind}_password`).value.trim();
+                    if(serverpassword == ""){
+                        alert('You forgot type password. 你忘记输入密码了');
+                        return;
+                    }
                 }
-            }
+                if(kind == 'wsserver'){
+                    wsserverport = parseInt(document.querySelector(`#${lang}_${kind}_port`).value.trim()).toString();
+                    if(wsserverport == "NaN"){
+                        alert('port should be a number. port应该是数字');
+                        return;
+                    }
+                    wsserverpassword = document.querySelector(`#${lang}_${kind}_password`).value.trim();
+                    if(wsserverpassword == ""){
+                        alert('You forgot type password. 你忘记输入密码了');
+                        return;
+                    }
+                }
+                if(kind == 'wssserver'){
+                    wssserverdomain = document.querySelector(`#${lang}_${kind}_password`).value.trim();
+                    if(wssserverdomain == ""){
+                        alert('You forgot type domain. 你忘记输入域名了');
+                        return;
+                    }
+                    wssserverpassword = document.querySelector(`#${lang}_${kind}_password`).value.trim();
+                    if(wssserverpassword == ""){
+                        alert('You forgot type password. 你忘记输入密码了');
+                        return;
+                    }
+                }
+                if(kind == 'socks5'){
+                    socks5port = parseInt(document.querySelector(`#${lang}_${kind}_port`).value.trim()).toString();
+                    socks5username = document.querySelector(`#${lang}_${kind}_username`).value.trim();
+                    socks5password = document.querySelector(`#${lang}_${kind}_password`).value.trim();
+                    if(socks5port == "NaN"){
+                        alert('port should be a number. port应该是数字');
+                        return;
+                    }
+                    if((socks5username == '' && socks5password != '') || (socks5username != '' && socks5password == '')){
+                        alert('Username and password should either exist together or not exist together. 用户名和密码应该要么一起存在, 要么一起不存在');
+                        return;
+                    }
+                }
+				var s = "curl -L https://git.io/getnami | bash && sleep 6 && exec -l $SHELL\n"
+				s += "nami install github.com/txthinking/brook\n";
+				s += "nami install github.com/txthinking/joker\n";
+				var doc = lang == "en" ? "The above commands are generated based on these documents\n" : "以上命令基于这几个文档生成\n";
+				doc += "\n";
+				doc += lang == "en" ? "https://txthinking.github.io/brook/#/README\n" : "https://txthinking.github.io/brook/#/zh-cn/README\n";
+				doc += lang == "en" ? "https://txthinking.github.io/brook/#/install-cli\n" : "https://txthinking.github.io/brook/#/zh-cn/install-cli\n";
+				if(kind == "server"){
+					s += `joker brook server --listen :${serverport} --password '${serverpassword}'`+"\n";
+					s += "joker list\n";
+					s += "s=`curl -4 ip.sb 2>/dev/null`; if [ $s != '' ]; then echo brook server: $s:"+serverport+"; else echo Can not find server public v4 IP; fi\n";
+					s += "s=`curl -6 ip.sb 2>/dev/null`; if [ $s != '' ]; then echo brook server: [$s]:"+serverport+"; else echo Can not find server public v6 IP; fi\n";
+					doc += lang == "en" ? "https://txthinking.github.io/brook/#/brook-server\n" : "https://txthinking.github.io/brook/#/zh-cn/brook-server\n";
+					doc += "\n";
+					doc += lang == "en" ? `- If there is a firewall, remember to allow TCP and UDP on port ${serverport}`+"\n" : `如果有防火墙, 记得允许${serverport}端口的TCP和UDP协议`+"\n";
+				}
+				if(kind == "wsserver"){
+					s += `joker brook wsserver --listen :${wsserverport} --password '${wsserverpassword}'`+"\n";
+					s += "joker list\n";
+					s += "s=`curl -4 ip.sb 2>/dev/null`; if [ $s != '' ]; then echo brook wsserver: ws://$s:"+wsserverport+"; else echo Can not find server public v4 IP; fi\n";
+					s += "s=`curl -6 ip.sb 2>/dev/null`; if [ $s != '' ]; then echo brook wsserver: ws://[$s]:"+wsserverport+"; else echo Can not find server public v6 IP; fi\n";
+					doc += lang == "en" ? "https://txthinking.github.io/brook/#/brook-wsserver\n" : "https://txthinking.github.io/brook/#/zh-cn/brook-wsserver\n";
+					doc += "\n";
+					doc += lang == "en" ? `- If there is a firewall, remember to allow TCP on port ${wsserverport}`+"\n" : `如果有防火墙, 记得允许${wsserverport}端口的TCP协议`+"\n";
+				}
+				if(kind == "wssserver"){
+					s += `joker brook wssserver --domain :${wssserverdomain} --password '${wssserverpassword}'`+"\n";
+					s += "joker list\n";
+					s += `echo brook wssserver: wss://${wssserverdomain}:443` + "\n";
+					doc += lang == "en" ? "https://txthinking.github.io/brook/#/brook-wssserver\n" : "https://txthinking.github.io/brook/#/zh-cn/brook-wssserver\n";
+					doc += "\n";
+					doc += lang == "en" ? `- If there is a firewall, remember to allow TCP on port 80 and 443`+"\n" : `如果有防火墙, 记得允许80和443端口的TCP协议`+"\n";
+					doc += lang == "en" ? `- Make sure your domain name has been successfully resolved to your server IP`+"\n" : `确保你的域名已经解析到你的服务器IP,`+"\n";
+				}
+				if(kind == "socks5" && socks5username == ""){
+					s += "s=`curl -4 ip.sb 2>/dev/null`; if [ $s != '' ]; then joker brook socks5 --socks5 $s:"+socks5port+"; else echo Can not find server public v4 IP; fi\n";
+					s += "s=`curl -4 ip.sb 2>/dev/null`; if [ $s != '' ]; then echo socks5 server: $s:"+socks5port+"; else echo Can not find server public v4 IP; fi\n";
+					doc += lang == "en" ? "https://txthinking.github.io/brook/#/brook-socks5\n" : "https://txthinking.github.io/brook/#/zh-cn/brook-socks5\n";
+					doc += "\n";
+					doc += lang == "en" ? `- If there is a firewall, remember to allow TCP and UDP on port ${socks5port}`+"\n" : `如果有防火墙, 记得允许${socks5port}端口的TCP和UDP协议`+"\n";
+				}
+				if(kind == "socks5" && socks5username != ""){
+					s += "s=`curl -4 ip.sb 2>/dev/null`; if [ $s != '' ]; then joker brook socks5 --socks5 $s:"+socks5port+" --username '"+socks5username+"' --password '"+socks5password+"'; else echo Can not find server public v4 IP; fi\n";
+					s += "s=`curl -4 ip.sb 2>/dev/null`; if [ $s != '' ]; then echo socks5 server: $s:"+socks5port+"; else echo Can not find server public v4 IP; fi\n";
+					doc += lang == "en" ? "https://txthinking.github.io/brook/#/brook-socks5\n" : "https://txthinking.github.io/brook/#/zh-cn/brook-socks5\n";
+					doc += "\n";
+					doc += lang == "en" ? `- If there is a firewall, remember to allow TCP and UDP on port ${socks5port}`+"\n" : `如果有防火墙, 记得允许${socks5port}端口的TCP和UDP协议`+"\n";
+				}
+				doc += lang == "en" ? "- Please use the root user to execute the above commands, the command to switch to root is: sudo su\n" : "请使用root用户执行以上命令, 切换到root的命令是: sudo su\n";
+				doc += lang == "en" ? "- If there is a problem, restart the machine and then run the above commands again\n" : "如果有问题就重启机器后再运行以上命令\n";
+				doc += "\n";
+				doc += lang == "en" ? "- It is strongly recommended to read the official document https://txthinking.github.io/brook/\n" : "强烈建议阅读官方文档https://txthinking.github.io/brook/#/zh-cn/\n";
+				document.querySelector(`#${lang}_code_flex`).style.display='flex';
+				document.querySelector(`#${lang}_copy_flex`).style.display='flex';
+				document.querySelector(`#${lang}_doc_flex`).style.display='flex';
+				document.querySelector(`#${lang}_code`).innerText = s;
+				document.querySelector(`#${lang}_copy`).setAttribute('data-clipboard-text', s);
+				document.querySelector(`#${lang}_doc`).innerText = doc;
+            };
         </script>
-    </div>
-</body>
+    </head>
+    <body style="background-color:#f0f2f5;">
+		<div id="en_nav">
+			<wl-nav fixed>
+				<div slot="left">
+					<h2>Brook server-side installation script</h2>
+				</div>
+				<div slot="right">
+					<wl-button flat inverted style="color:white;"><a href="https://github.com/txthinking/brook">Brook Github</a></wl-button>
+					<wl-button flat inverted style="color:white;"><a href="https://txthinking.github.io/brook/">Document</a></wl-button>
+					<wl-button flat inverted style="color:white;"><a href="https://github.com/brook-community">Brook Community Github</a></wl-button>
+				</div>
+			</wl-nav>
+		</div>
+		<div id="zh_nav" style="display:none;">
+			<wl-nav fixed>
+				<div slot="left">
+					<h2>Brook服务端安装脚本</h2>
+				</div>
+				<div slot="right">
+					<wl-button flat inverted style="color:white;"><a href="https://github.com/txthinking/brook">Brook Github</a></wl-button>
+					<wl-button flat inverted style="color:white;"><a href="https://txthinking.github.io/brook/#/zh-cn/">官方文档</a></wl-button>
+					<wl-button flat inverted style="color:white;"><a href="https://github.com/brook-community">Brook Community Github</a></wl-button>
+				</div>
+			</wl-nav>
+		</div>
+        <div style="height:100px;"></div>
+        <div style="display:flex;flex-direction:row;justify-content:center;">
+            <wl-tab-group align="center">
+                <wl-tab checked id="en" onclick="changelang('en')">🇬🇧English</wl-tab>
+                <wl-tab id="zh" onclick="changelang('zh')">🇨🇳中文</wl-tab>
+            </wl-tab-group>
+            <div></div>
+        </div>
+        <div style="height:20px;"></div>
+        <div id="en_flex" style="display:flex;flex-direction:column;">
+            <div style="height:20px;"></div>
+            <div style="display:flex;flex-direction:row;justify-content:center;">
+                <wl-tab-group align="center">
+                    <wl-tab checked id="en_ni" onclick="changei('en', 'ni')">Non-interactive</wl-tab>
+                    <wl-tab id="en_i" onclick="changei('en', 'i')">Interactive</wl-tab>
+                </wl-tab-group>
+            </div>
+            <div style="height:40px;"></div>
+			<div id="en_ni_block" style="display:block;">
+				<div style="display:flex;flex-direction:row;justify-content:center;">
+					<wl-card style="width:300px;display:flex;flex-direction:column;">
+						<wl-select id="en_select" label="Select server type" onchange="select('en')">
+							<option value disabled selected value="">Select</option>
+							<option value="server">brook server</option>
+							<option value="wsserver">brook wsserver</option>
+							<option value="wssserver">brook wssserver</option>
+							<option value="socks5">socks5 server</option>
+						</wl-select>
+						<div style="display:none;flex-direction:column;" id="en_server_flex">
+							<div style="height:20px;"></div>
+							<wl-textfield label="port, example: 9999" id="en_server_port"></wl-textfield>
+							<div style="height:20px;"></div>
+							<wl-textfield label="password" id="en_server_password"></wl-textfield>
+							<div style="height:20px;"></div>
+							<wl-button onclick="generate('en')">Generate scripts</wl-button>
+						</div>
+						<div style="display:none;flex-direction:column;" id="en_wsserver_flex">
+							<div style="height:20px;"></div>
+							<wl-textfield label="port, example: 9999" id="en_wsserver_port"></wl-textfield>
+							<div style="height:20px;"></div>
+							<wl-textfield label="password" id="en_wsserver_password"></wl-textfield>
+							<div style="height:20px;"></div>
+							<wl-button onclick="generate('en')">Generate scripts</wl-button>
+						</div>
+						<div style="display:none;flex-direction:column;" id="en_wssserver_flex">
+							<div style="height:20px;"></div>
+							<wl-textfield label="your domain, example: domain.com" id="en_wssserver_domain"></wl-textfield>
+							<div style="height:20px;"></div>
+							<wl-textfield label="password" id="en_wssserver_password"></wl-textfield>
+							<div style="height:20px;"></div>
+							<wl-button onclick="generate('en')">Generate scripts</wl-button>
+						</div>
+						<div style="display:none;flex-direction:column;" id="en_socks5_flex">
+							<div style="height:20px;"></div>
+							<wl-textfield label="port, example: 9999" id="en_socks5_port"></wl-textfield>
+							<div style="height:20px;"></div>
+							<wl-textfield label="username, optional" id="en_socks5_username"></wl-textfield>
+							<div style="height:20px;"></div>
+							<wl-textfield label="password, optional" id="en_socks5_password"></wl-textfield>
+							<div style="height:20px;"></div>
+							<wl-button onclick="generate('en')">Generate scripts</wl-button>
+						</div>
+					</wl-card>
+				</div>
+				<div id="en_code_flex" style="display:none;flex-direction:row;justify-content:center;">
+						<pre>
+						<code id="en_code"></code>
+						</pre>
+				</div>
+				<div id="en_copy_flex" style="display:none;flex-direction:row;justify-content:center;">
+					<wl-button id="en_copy">Copy scripts</wl-button>
+				</div>
+				<div style="height:20px;"></div>
+				<div id="en_doc_flex" style="display:none;flex-direction:row;justify-content:center;">
+					<wl-card style="max-width:80%;display:flex;flex-direction:column;">
+						<wl-text id="en_doc" style="color:red;"></wl-text>
+					</wl-card>
+				</div>
+			</div>
+			<div id="en_i_block" style="display:none;">
+				<div style="display:flex;flex-direction:row;justify-content:center;">
+					<wl-card style="width:300px;display:flex;flex-direction:column;">
+						<wl-select id="en_i_select" label="Select server type" onchange="iselect('en')">
+							<option value disabled selected value="">Default</option>
+							<option value="server">brook server</option>
+							<option value="wsserver">brook wsserver</option>
+							<option value="socks5">socks5 server</option>
+							<option value="jokerbrook">only install brook</option>
+						</wl-select>
+					</wl-card>
+				</div>
+				<div style="height:20px;"></div>
+				<div style="display:flex;flex-direction:row;justify-content:center;">
+						<pre>
+						<code id="en_i_code">bash <(curl -sL https://git.io/brook.sh)</code>
+						</pre>
+				</div>
+				<div style="display:flex;flex-direction:row;justify-content:center;">
+					<wl-button id="en_i_copy" data-clipboard-text="bash <(curl -sL https://git.io/brook.sh)">Copy</wl-button>
+				</div>
+			</div>
+        </div>
 
+        <div id="zh_flex" style="display:none;flex-direction:column;">
+            <div style="height:20px;"></div>
+            <div style="display:flex;flex-direction:row;justify-content:center;">
+                <wl-tab-group align="center">
+                    <wl-tab checked id="zh_ni" onclick="changei('zh', 'ni')">非交互式</wl-tab>
+                    <wl-tab id="zh_i" onclick="changei('zh', 'i')">交互式</wl-tab>
+                </wl-tab-group>
+            </div>
+            <div style="height:40px;"></div>
+			<div id="zh_ni_block" style="display:block;">
+				<div style="display:flex;flex-direction:row;justify-content:center;">
+					<wl-card style="width:300px;display:flex;flex-direction:column;">
+						<wl-select id="zh_select" label="选择服务端类型" onchange="select('zh')">
+							<option value disabled selected value="">选择</option>
+							<option value="server">brook server</option>
+							<option value="wsserver">brook wsserver</option>
+							<option value="wssserver">brook wssserver</option>
+							<option value="socks5">socks5 server</option>
+						</wl-select>
+						<div style="display:none;flex-direction:column;" id="zh_server_flex">
+							<div style="height:20px;"></div>
+							<wl-textfield label="端口, 比如: 9999" id="zh_server_port"></wl-textfield>
+							<div style="height:20px;"></div>
+							<wl-textfield label="密码" id="zh_server_password"></wl-textfield>
+							<div style="height:20px;"></div>
+							<wl-button onclick="generate('zh')">生成脚本</wl-button>
+						</div>
+						<div style="display:none;flex-direction:column;" id="zh_wsserver_flex">
+							<div style="height:20px;"></div>
+							<wl-textfield label="端口, 比如: 9999" id="zh_wsserver_port"></wl-textfield>
+							<div style="height:20px;"></div>
+							<wl-textfield label="密码" id="zh_wsserver_password"></wl-textfield>
+							<div style="height:20px;"></div>
+							<wl-button onclick="generate('zh')">生成脚本</wl-button>
+						</div>
+						<div style="display:none;flex-direction:column;" id="zh_wssserver_flex">
+							<div style="height:20px;"></div>
+							<wl-textfield label="你的域名, 比如: domain.com" id="zh_wssserver_domain"></wl-textfield>
+							<div style="height:20px;"></div>
+							<wl-textfield label="密码" id="zh_wssserver_password"></wl-textfield>
+							<div style="height:20px;"></div>
+							<wl-button onclick="generate('zh')">生成脚本</wl-button>
+						</div>
+						<div style="display:none;flex-direction:column;" id="zh_socks5_flex">
+							<div style="height:20px;"></div>
+							<wl-textfield label="端口, 比如: 9999" id="zh_socks5_port"></wl-textfield>
+							<div style="height:20px;"></div>
+							<wl-textfield label="用户名, 可选" id="zh_socks5_username"></wl-textfield>
+							<div style="height:20px;"></div>
+							<wl-textfield label="密码, 可选" id="zh_socks5_password"></wl-textfield>
+							<div style="height:20px;"></div>
+							<wl-button onclick="generate('zh')">生成脚本</wl-button>
+						</div>
+					</wl-card>
+				</div>
+				<div id="zh_code_flex" style="display:none;flex-direction:row;justify-content:center;">
+						<pre>
+						<code id="zh_code"></code>
+						</pre>
+				</div>
+				<div id="zh_copy_flex" style="display:none;flex-direction:row;justify-content:center;">
+					<wl-button id="zh_copy">Copy scripts</wl-button>
+				</div>
+				<div style="height:20px;"></div>
+				<div id="zh_doc_flex" style="display:none;flex-direction:row;justify-content:center;">
+					<wl-card style="max-width:80%;display:flex;flex-direction:column;">
+						<wl-text id="zh_doc" style="color:red;"></wl-text>
+					</wl-card>
+				</div>
+			</div>
+			<div id="zh_i_block" style="display:none;">
+				<div style="display:flex;flex-direction:row;justify-content:center;">
+					<wl-card style="width:300px;display:flex;flex-direction:column;">
+						<wl-select id="zh_i_select" label="选择服务端类型" onchange="iselect('zh')">
+							<option value disabled selected value="">默认</option>
+							<option value="server">brook server</option>
+							<option value="wsserver">brook wsserver</option>
+							<option value="socks5">socks5 server</option>
+							<option value="jokerbrook">只安装 brook</option>
+						</wl-select>
+					</wl-card>
+				</div>
+				<div style="height:20px;"></div>
+				<div style="display:flex;flex-direction:row;justify-content:center;">
+						<pre>
+						<code id="zh_i_code">bash <(curl -sL https://git.io/brook.sh)</code>
+						</pre>
+				</div>
+				<div style="display:flex;flex-direction:row;justify-content:center;">
+					<wl-button id="zh_i_copy" data-clipboard-text="bash <(curl -sL https://git.io/brook.sh)">复制</wl-button>
+				</div>
+			</div>
+        </div>
+
+		<div style="height:60px;"></div>
+		<div id="en_footer_flex" style="display:flex;flex-direction:row;background-color:white;justify-content:space-between;margin-top:auto;padding:30px;">
+			<div style="display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start;">
+				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://github.com/txthinking/brook">Brook Github</a></wl-button>
+				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://txthinking.github.io/brook/">Document</a></wl-button>
+				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://talks.txthinking.com">Blog</a></wl-button>
+				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://www.youtube.com/channel/UC5j8-I5Y4lWo4KTa4_0Kx5A">Youtube</a></wl-button>
+				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://github.com/brook-community">Brook Community Github</a></wl-button>
+			</div>
+			<div style="display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start;">
+				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://github.com/txthinking/brook/discussions">Community</a></wl-button>
+				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://t.me/brookgroup">Telegram Group</a></wl-button>
+				<wl-button flat inverted style="color:black;text-transform: none;"><a href="Telegram Channel">Telegram Channel</a></wl-button>
+				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://github.com/txthinking/nami">Nami</a></wl-button>
+				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://github.com/txthinking/joker">Joker</a></wl-button>
+				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://twitter.com/txthinking">Twitter</a></wl-button>
+			</div>
+		</div>
+		<div id="zh_footer_flex" style="display:none;flex-direction:row;background-color:white;justify-content:space-between;margin-top:auto;padding:30px;">
+			<div style="display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start;">
+				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://github.com/txthinking/brook">Brook Github</a></wl-button>
+				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://txthinking.github.io/brook/">官方文档</a></wl-button>
+				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://talks.txthinking.com">博客</a></wl-button>
+				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://www.youtube.com/channel/UC5j8-I5Y4lWo4KTa4_0Kx5A">Youtube</a></wl-button>
+				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://github.com/brook-community">Brook Community Github</a></wl-button>
+			</div>
+			<div style="display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start;">
+				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://github.com/txthinking/brook/discussions">论坛</a></wl-button>
+				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://t.me/brookgroup">Telegram 群组</a></wl-button>
+				<wl-button flat inverted style="color:black;text-transform: none;"><a href="Telegram Channel">Telegram 频道</a></wl-button>
+				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://github.com/txthinking/nami">Nami</a></wl-button>
+				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://github.com/txthinking/joker">Joker</a></wl-button>
+				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://twitter.com/txthinking">Twitter</a></wl-button>
+			</div>
+		</div>
+
+		<script>
+			new ClipboardJS('#en_copy');
+			new ClipboardJS('#zh_copy');
+			new ClipboardJS('#en_i_copy');
+			new ClipboardJS('#zh_i_copy');
+		</script>
+    </body>
 </html>
