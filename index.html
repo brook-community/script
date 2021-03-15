@@ -13,10 +13,6 @@
 				min-height: 100vh;
 				flex-direction: column;
 			}
-			wl-nav{
-				--nav-bg:black;
-				--nav-color:white;
-			}
 			a,a:link,a:visited,a:hover,a:active{
 				color:inherit;
 			}
@@ -64,12 +60,12 @@
             var changelang = lang => {
 				document.querySelector(`#en_flex`).style.display='none';
 				document.querySelector(`#zh_flex`).style.display='none';
-				document.querySelector(`#en_nav`).style.display='none';
-				document.querySelector(`#zh_nav`).style.display='none';
+				document.querySelector(`#en_nav_flex`).style.display='none';
+				document.querySelector(`#zh_nav_flex`).style.display='none';
 				document.querySelector(`#en_footer_flex`).style.display='none';
 				document.querySelector(`#zh_footer_flex`).style.display='none';
 				document.querySelector(`#${lang}_flex`).style.display='flex';
-				document.querySelector(`#${lang}_nav`).style.display='block';
+				document.querySelector(`#${lang}_nav_flex`).style.display='flex';
 				document.querySelector(`#${lang}_footer_flex`).style.display='flex';
 			};
             var changei = (lang, s) => {
@@ -112,9 +108,11 @@
                 var wsserverpassword = '';
                 var wssserverdomain = '';
                 var wssserverpassword = '';
+                var socks5ipv = '';
                 var socks5port = '';
                 var socks5username = '';
                 var socks5password = '';
+				var port = '';
                 if(kind == 'server'){
                     serverport = parseInt(document.querySelector(`#${lang}_${kind}_port`).value.trim()).toString();
                     if(serverport == "NaN"){
@@ -126,6 +124,7 @@
                         alert('You forgot type password. 你忘记输入密码了');
                         return;
                     }
+					port = serverport;
                 }
                 if(kind == 'wsserver'){
                     wsserverport = parseInt(document.querySelector(`#${lang}_${kind}_port`).value.trim()).toString();
@@ -138,9 +137,10 @@
                         alert('You forgot type password. 你忘记输入密码了');
                         return;
                     }
+					port = wsserverport;
                 }
                 if(kind == 'wssserver'){
-                    wssserverdomain = document.querySelector(`#${lang}_${kind}_password`).value.trim();
+                    wssserverdomain = document.querySelector(`#${lang}_${kind}_domain`).value.trim();
                     if(wssserverdomain == ""){
                         alert('You forgot type domain. 你忘记输入域名了');
                         return;
@@ -152,9 +152,14 @@
                     }
                 }
                 if(kind == 'socks5'){
+                    socks5ipv = parseInt(document.querySelector(`#${lang}_${kind}_ipv`).value.trim()).toString();
                     socks5port = parseInt(document.querySelector(`#${lang}_${kind}_port`).value.trim()).toString();
                     socks5username = document.querySelector(`#${lang}_${kind}_username`).value.trim();
                     socks5password = document.querySelector(`#${lang}_${kind}_password`).value.trim();
+                    if(socks5ipv != "4" && socks5ipv != 6){
+                        alert('IPv must be 4 or 6. IPv应该是4或者6');
+                        return;
+                    }
                     if(socks5port == "NaN"){
                         alert('port should be a number. port应该是数字');
                         return;
@@ -163,59 +168,166 @@
                         alert('Username and password should either exist together or not exist together. 用户名和密码应该要么一起存在, 要么一起不存在');
                         return;
                     }
+					port = socks5port;
                 }
-				var s = "curl -L https://git.io/getnami | bash && sleep 6 && exec -l $SHELL\n"
-				s += "nami install github.com/txthinking/brook\n";
-				s += "nami install github.com/txthinking/joker\n";
-				var doc = lang == "en" ? "The above commands are generated based on these documents\n" : "以上命令基于这几个文档生成\n";
+				var s = "export RED='\\033[0;31m'\n";
+				s += "export GREEN='\\033[0;32m'\n";
+				s += "export ORANGE='\\033[0;33m'\n";
+				s += "export NC='\\033[0m'\n";
+				s += "export ERROR=0\n";
+				s += `test \`id -u\` -ne 0 && printf "\\n\${RED}You are not using root user, please change to root user: $ sudo su\${NC}\\n\\n" && export ERROR=1\n`;
+				if(lang == 'zh'){
+					s += `test \`id -u\` -ne 0 && printf "\\n\${RED}当前用户不是root, 请先切换到root用户: $ sudo su\${NC}\\n\\n" && export ERROR=1\n`;
+				}
+				if(port != ''){
+					s += `test \`lsof -i :${port} | grep :${port} | wc -l\` -ne 0 &&  printf "\\n\${RED}Port ${port} is already occupied\${NC}\\n\\n" && export ERROR=1\n`;
+					if(lang == 'zh'){
+						s += `test \`lsof -i :${port} | grep :${port} | wc -l\` -ne 0 &&  printf "\\n\${RED}端口 ${port} 已被占用\${NC}\\n\\n" && export ERROR=1\n`;
+					}
+				}
+				if(port == ''){
+					s += `test \`lsof -i :80 | grep :80 | wc -l\` -ne 0 &&  printf "\\n\${RED}Port 80 is already occupied\${NC}\\n\\n" && export ERROR=1\n`;
+					s += `test \`lsof -i :443 | grep :443 | wc -l\` -ne 0 &&  printf "\\n\${RED}Port 443 is already occupied\${NC}\\n\\n" && export ERROR=1\n`;
+					if(lang == 'zh'){
+						s += `test \`lsof -i :80 | grep :80 | wc -l\` -ne 0 &&  printf "\\n\${RED}端口 80 已被占用\${NC}\\n\\n" && export ERROR=1\n`;
+						s += `test \`lsof -i :443 | grep :443 | wc -l\` -ne 0 &&  printf "\\n\${RED}端口 443 已被占用\${NC}\\n\\n" && export ERROR=1\n`;
+					}
+				}
+				if(kind == 'wssserver'){
+					s += `export sip4=\`curl -4 ip.sb 2>/dev/null\`\n`;
+					s += `export sip6=\`curl -6 ip.sb 2>/dev/null\`\n`;
+					s += `if [ "\$sip4" == "" -a "\$sip6" == "" ]; then printf "\\n\${RED}Can not find server public IP\${NC}\\n\\n" && export ERROR=1; fi\n`;
+					s += `export ip4=\`dig +short -t A ${wssserverdomain}\`\n`;
+					s += `export ip6=\`dig +short -t AAAA ${wssserverdomain}\`\n`;
+					s += `if [ "\$ip4" == "" -a "\$ip6" == "" ]; then printf "\\n\${RED}Please resolve the domain name to your server IP first\${NC}\\n\\n" && export ERROR=1; fi\n`;
+					if(lang == 'zh'){
+						s += `if [ "\$ip4" == "" -a "\$ip6" == "" ]; then printf "\\n\${RED}请先解析域名到你的服务器IP\${NC}\\n\\n" && export ERROR=1; fi\n`;
+					}
+					s += `if [ "\$ip4" != "" -a "\$ip4" != "\$sip4" ]; then printf "\\n\${RED}Please resolve the domain name to your server IP first\${NC}\\n\\n" && export ERROR=1; fi\n`;
+					if(lang == 'zh'){
+						s += `if [ "\$ip4" != "" -a "\$ip4" == "\$sip4" ]; then printf "\\n\${RED}请先解析域名到你的服务器IP\${NC}\\n\\n" && export ERROR=1; fi\n`;
+					}
+					s += `if [ "\$ip6" != "" -a "\$ip6" != "\$sip6" ]; then printf "\\n\${RED}Please resolve the domain name to your server IP first\${NC}\\n\\n" && export ERROR=1; fi\n`;
+					if(lang == 'zh'){
+						s += `if [ "\$ip6" != "" -a "\$ip6" == "\$sip6" ]; then printf "\\n\${RED}请先解析域名到你的服务器IP\${NC}\\n\\n" && export ERROR=1; fi\n`;
+					}
+				}
+				s += "test $ERROR -eq 0 && curl -L https://git.io/getnami | bash && sleep 6 && exec -l $SHELL\n"
+				s += "test $ERROR -eq 0 && nami install github.com/txthinking/brook\n";
+				s += "test $ERROR -eq 0 && nami install github.com/txthinking/joker\n";
+				s += "test $ERROR -eq 0 && nami install github.com/brook-community/testsocks5\n";
+				var doc = lang == "en" ? "Copy and paste directly into your terminal and press enter\n" : "复制后直接粘贴到你的终端回车即可\n";
+				doc += lang == "en" ? "The above commands are generated based on these documents and added some checks, if you look at the documentation, the actual commands are simpler\n" : "以上命令基于这几个文档生成并加了一些检查, 如果你看文档实际命令更简单\n";
 				doc += "\n";
 				doc += lang == "en" ? "https://txthinking.github.io/brook/#/README\n" : "https://txthinking.github.io/brook/#/zh-cn/README\n";
 				doc += lang == "en" ? "https://txthinking.github.io/brook/#/install-cli\n" : "https://txthinking.github.io/brook/#/zh-cn/install-cli\n";
 				if(kind == "server"){
-					s += `joker brook server --listen :${serverport} --password '${serverpassword}'`+"\n";
-					s += "joker list\n";
-					s += "s=`curl -4 ip.sb 2>/dev/null`; if [ $s != '' ]; then echo brook server: $s:"+serverport+"; else echo Can not find server public v4 IP; fi\n";
-					s += "s=`curl -6 ip.sb 2>/dev/null`; if [ $s != '' ]; then echo brook server: [$s]:"+serverport+"; else echo Can not find server public v6 IP; fi\n";
+					s += `test \$ERROR -eq 0 && joker brook server --listen :${serverport} --password '${serverpassword}'\n`;
+					s += "test $ERROR -eq 0 && sleep 3\n";
+					s += "test $ERROR -eq 0 && joker list\n";
+					s += `s=\`curl -4 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && printf "\\n\${GREEN}brook server: \$s:${serverport}\${NC}\\n\\n" && export SERVER4=\$s:${serverport}; else printf "\\n\${RED}Can not find server public v4 IP\${NC}\\n\\n"; fi\n`;
+					s += `s=\`curl -6 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && printf "\\n\${GREEN}brook server: [\$s]:${serverport}\${NC}\\n\\n" && export SERVER6=[\$s]:${serverport}; else printf "\\n\${RED}Can not find server public v6 IP\${NC}\\n\\n"; fi\n`;
 					doc += lang == "en" ? "https://txthinking.github.io/brook/#/brook-server\n" : "https://txthinking.github.io/brook/#/zh-cn/brook-server\n";
 					doc += "\n";
-					doc += lang == "en" ? `- If there is a firewall, remember to allow TCP and UDP on port ${serverport}`+"\n" : `如果有防火墙, 记得允许${serverport}端口的TCP和UDP协议`+"\n";
+					doc += lang == "en" ? `- If there is a firewall, remember to allow TCP and UDP on port ${serverport}\n` : `- 如果有防火墙, 记得允许${serverport}端口的TCP和UDP协议\n`;
 				}
 				if(kind == "wsserver"){
-					s += `joker brook wsserver --listen :${wsserverport} --password '${wsserverpassword}'`+"\n";
-					s += "joker list\n";
-					s += "s=`curl -4 ip.sb 2>/dev/null`; if [ $s != '' ]; then echo brook wsserver: ws://$s:"+wsserverport+"; else echo Can not find server public v4 IP; fi\n";
-					s += "s=`curl -6 ip.sb 2>/dev/null`; if [ $s != '' ]; then echo brook wsserver: ws://[$s]:"+wsserverport+"; else echo Can not find server public v6 IP; fi\n";
+					s += `test \$ERROR -eq 0 && joker brook wsserver --listen :${wsserverport} --password '${wsserverpassword}'\n`;
+					s += "test $ERROR -eq 0 && sleep 3\n";
+					s += "test $ERROR -eq 0 && joker list\n";
+					s += `s=\`curl -4 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && printf "\\n\${GREEN}brook wsserver: ws://\$s:${wsserverport}\${NC}\\n\\n" && export WSSERVER4=ws://\$s:${wsserverport}; else printf "\\n\${RED}Can not find server public v4 IP\${NC}\\n\\n"; fi\n`;
+					s += `s=\`curl -6 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && printf "\\n\${GREEN}brook wsserver: ws://[\$s]:${wsserverport}\${NC}\\n\\n" && export WSSERVER6=ws://[\$s]:${wsserverport}; else printf "\\n\${RED}Can not find server public v6 IP\${NC}\\n\\n"; fi\n`;
 					doc += lang == "en" ? "https://txthinking.github.io/brook/#/brook-wsserver\n" : "https://txthinking.github.io/brook/#/zh-cn/brook-wsserver\n";
 					doc += "\n";
-					doc += lang == "en" ? `- If there is a firewall, remember to allow TCP on port ${wsserverport}`+"\n" : `如果有防火墙, 记得允许${wsserverport}端口的TCP协议`+"\n";
+					doc += lang == "en" ? `- If there is a firewall, remember to allow TCP on port ${wsserverport}\n` : `- 如果有防火墙, 记得允许${wsserverport}端口的TCP协议\n`;
 				}
 				if(kind == "wssserver"){
-					s += `joker brook wssserver --domain :${wssserverdomain} --password '${wssserverpassword}'`+"\n";
-					s += "joker list\n";
-					s += `echo brook wssserver: wss://${wssserverdomain}:443` + "\n";
+					s += `test \$ERROR -eq 0 && joker brook wssserver --domain ${wssserverdomain} --password '${wssserverpassword}'\n`;
+					s += "test $ERROR -eq 0 && sleep 3\n";
+					s += "test $ERROR -eq 0 && joker list\n";
+					s += `test \$ERROR -eq 0 && printf "\\n\${GREEN}brook wssserver: wss://${wssserverdomain}:443\${NC}\\n\\n" && export WSSSERVER=wss://${wssserverdomain}:443\n`;
 					doc += lang == "en" ? "https://txthinking.github.io/brook/#/brook-wssserver\n" : "https://txthinking.github.io/brook/#/zh-cn/brook-wssserver\n";
 					doc += "\n";
-					doc += lang == "en" ? `- If there is a firewall, remember to allow TCP on port 80 and 443`+"\n" : `如果有防火墙, 记得允许80和443端口的TCP协议`+"\n";
-					doc += lang == "en" ? `- Make sure your domain name has been successfully resolved to your server IP`+"\n" : `确保你的域名已经解析到你的服务器IP,`+"\n";
+					doc += lang == "en" ? `- If there is a firewall, remember to allow TCP on port 80 and 443\n` : `- 如果有防火墙, 记得允许80和443端口的TCP协议\n`;
+					doc += lang == "en" ? `- Make sure your domain name has been successfully resolved to your server IP\n` : `- 确保你的域名已经解析到你的服务器IP\n`;
 				}
-				if(kind == "socks5" && socks5username == ""){
-					s += "s=`curl -4 ip.sb 2>/dev/null`; if [ $s != '' ]; then joker brook socks5 --socks5 $s:"+socks5port+"; else echo Can not find server public v4 IP; fi\n";
-					s += "s=`curl -4 ip.sb 2>/dev/null`; if [ $s != '' ]; then echo socks5 server: $s:"+socks5port+"; else echo Can not find server public v4 IP; fi\n";
-					doc += lang == "en" ? "https://txthinking.github.io/brook/#/brook-socks5\n" : "https://txthinking.github.io/brook/#/zh-cn/brook-socks5\n";
-					doc += "\n";
-					doc += lang == "en" ? `- If there is a firewall, remember to allow TCP and UDP on port ${socks5port}`+"\n" : `如果有防火墙, 记得允许${socks5port}端口的TCP和UDP协议`+"\n";
+				if(kind == "socks5" && socks5ipv == "4"){
+					if(socks5username == ""){
+						s += `s=\`curl -4 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && joker brook socks5 --socks5 \$s:${socks5port}; else printf "\\n\${RED}Can not find server public v4 IP\${NC}\\n\\n"; fi\n`;
+						s += "test $ERROR -eq 0 && sleep 3\n";
+						s += "test $ERROR -eq 0 && joker list\n";
+						s += `s=\`curl -4 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && printf "\\n\${GREEN}socks5 server: \$s:${socks5port}\${NC}\\n\\n" && export SOCKS5SERVER4=\$s:${socks5port}; else printf "\\n\${RED}Can not find server public v4 IP\${NC}\\n\\n"; fi\n`;
+						doc += lang == "en" ? "https://txthinking.github.io/brook/#/brook-socks5\n" : "https://txthinking.github.io/brook/#/zh-cn/brook-socks5\n";
+						doc += "\n";
+						doc += lang == "en" ? `- If there is a firewall, remember to allow TCP and UDP on port ${socks5port}\n` : `- 如果有防火墙, 记得允许${socks5port}端口的TCP和UDP协议\n`;
+					}
+					if(socks5username != ""){
+						s += `s=\`curl -4 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && joker brook socks5 --socks5 \$s:${socks5port} --username '${socks5username}' --password '${socks5password}'; else printf "\\n\${RED}Can not find server public v4 IP\${NC}\\n\\n"; fi\n`;
+						s += "test $ERROR -eq 0 && sleep 3\n";
+						s += "test $ERROR -eq 0 && joker list\n";
+						s += `s=\`curl -4 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && printf "\\n\${GREEN}socks5 server: \$s:${socks5port}\${NC}\\n\\n" && export SOCKS5SERVER4=\$s:${socks5port}; else printf "\\n\${RED}Can not find server public v4 IP\${NC}\\n\\n"; fi\n`;
+						doc += lang == "en" ? "https://txthinking.github.io/brook/#/brook-socks5\n" : "https://txthinking.github.io/brook/#/zh-cn/brook-socks5\n";
+						doc += "\n";
+						doc += lang == "en" ? `- If there is a firewall, remember to allow TCP and UDP on port ${socks5port}\n` : `- 如果有防火墙, 记得允许${socks5port}端口的TCP和UDP协议\n`;
+					}
 				}
-				if(kind == "socks5" && socks5username != ""){
-					s += "s=`curl -4 ip.sb 2>/dev/null`; if [ $s != '' ]; then joker brook socks5 --socks5 $s:"+socks5port+" --username '"+socks5username+"' --password '"+socks5password+"'; else echo Can not find server public v4 IP; fi\n";
-					s += "s=`curl -4 ip.sb 2>/dev/null`; if [ $s != '' ]; then echo socks5 server: $s:"+socks5port+"; else echo Can not find server public v4 IP; fi\n";
-					doc += lang == "en" ? "https://txthinking.github.io/brook/#/brook-socks5\n" : "https://txthinking.github.io/brook/#/zh-cn/brook-socks5\n";
-					doc += "\n";
-					doc += lang == "en" ? `- If there is a firewall, remember to allow TCP and UDP on port ${socks5port}`+"\n" : `如果有防火墙, 记得允许${socks5port}端口的TCP和UDP协议`+"\n";
+				if(kind == "socks5" && socks5ipv == "6"){
+					if(socks5username == ""){
+						s += `s=\`curl -6 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && joker brook socks5 --socks5 [\$s]:${socks5port}; else printf "\\n\${RED}Can not find server public v6 IP\${NC}\\n\\n"; fi\n`;
+						s += "test $ERROR -eq 0 && sleep 3\n";
+						s += "test $ERROR -eq 0 && joker list\n";
+						s += `s=\`curl -6 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && printf "\\n\${GREEN}socks5 server: [\$s]:${socks5port}\${NC}\\n\\n" && export SOCKS5SERVER6=[\$s]:${socks5port}; else printf "\\n\${RED}Can not find server public v6 IP\${NC}\\n\\n"; fi\n`;
+						doc += lang == "en" ? "https://txthinking.github.io/brook/#/brook-socks5\n" : "https://txthinking.github.io/brook/#/zh-cn/brook-socks5\n";
+						doc += "\n";
+						doc += lang == "en" ? `- If there is a firewall, remember to allow TCP and UDP on port ${socks5port}\n` : `- 如果有防火墙, 记得允许${socks5port}端口的TCP和UDP协议\n`;
+					}
+					if(socks5username != ""){
+						s += `s=\`curl -6 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && joker brook socks5 --socks5 [\$s]:${socks5port} --username '${socks5username}' --password '${socks5password}'; else printf "\\n\${RED}Can not find server public v6 IP\${NC}\\n\\n"; fi\n`;
+						s += "test $ERROR -eq 0 && sleep 3\n";
+						s += "test $ERROR -eq 0 && joker list\n";
+						s += `s=\`curl -6 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && printf "\\n\${GREEN}socks5 server: [\$s]:${socks5port}\${NC}\\n\\n" && export SOCKS5SERVER6=[\$s]:${socks5port}; else printf "\\n\${RED}Can not find server public v6 IP\${NC}\\n\\n"; fi\n`;
+						doc += lang == "en" ? "https://txthinking.github.io/brook/#/brook-socks5\n" : "https://txthinking.github.io/brook/#/zh-cn/brook-socks5\n";
+						doc += "\n";
+						doc += lang == "en" ? `- If there is a firewall, remember to allow TCP and UDP on port ${socks5port}\n` : `- 如果有防火墙, 记得允许${socks5port}端口的TCP和UDP协议\n`;
+					}
 				}
-				doc += lang == "en" ? "- Please use the root user to execute the above commands, the command to switch to root is: sudo su\n" : "请使用root用户执行以上命令, 切换到root的命令是: sudo su\n";
-				doc += lang == "en" ? "- If there is a problem, restart the machine and then run the above commands again\n" : "如果有问题就重启机器后再运行以上命令\n";
+				s += `test $ERROR -ne 0 && printf "\\n\${RED}Please check the red text error message printed above\${NC}\\n\\n"\n`;
+				if(lang == 'zh'){
+					s += `test $ERROR -ne 0 && printf "\\n\${RED}请检查上面打印的红色文字错误信息\${NC}\\n\\n"\n`;
+				}
+				s += `test $ERROR -eq 0 && printf "\\n\${ORANGE}Don't forget to allow TCP and UDP protocols on port ${port || '80, 443'} in the firewall\${NC}\\n\\n"\n`;
+				if(lang == 'zh'){
+					s += `test $ERROR -eq 0 && printf "\\n\${ORANGE}防火墙不要忘记允许端口${port || '80, 443'}的TCP和UDP协议\${NC}\\n\\n"\n`;
+				}
+				if(kind == 'server'){
+					s += `if [ -z \${SERVER4+x} ]; then echo; else printf "\\n\${ORANGE}Testing \$SERVER4 ...\${NC}\\n\\n" && joker brook client -s \$SERVER4 -p '${serverpassword}' --socks5 127.0.0.1:24680 && testsocks5 -s 127.0.0.1:24680; joker stop \`joker list | grep brook | grep client | awk '{print \$1}'\`; echo; fi\n`;
+					// https://github.com/txthinking/joker/issues/6
+					s += `if [ -z \${SERVER6+x} ]; then echo; else printf "\\n\${ORANGE}Currently does not support testing \$SERVER6\${NC}\\n\\n"; fi\n`;
+				}
+				if(kind == 'wsserver'){
+					s += `if [ -z \${WSSERVER4+x} ]; then echo; else printf "\\n\${ORANGE}Testing \$WSSERVER4 ...\${NC}\\n\\n" && joker brook wsclient -s \$WSSERVER4 -p '${wsserverpassword}' --socks5 127.0.0.1:24680 && testsocks5 -s 127.0.0.1:24680; joker stop \`joker list | grep brook | grep client | awk '{print \$1}'\`; echo; fi\n`;
+					// https://github.com/txthinking/joker/issues/6
+					s += `if [ -z \${WSSERVER6+x} ]; then echo; else printf "\\n\${ORANGE}Currently does not support testing \$WSSERVER6\${NC}\\n\\n"; fi\n`;
+				}
+				if(kind == 'wssserver'){
+					s += `if [ -z \${WSSSERVER+x} ]; then echo; else printf "\\n\${ORANGE}Testing \$WSSSERVER ...\${NC}\\n\\n" && sleep 6 && joker brook wssclient -s \$WSSSERVER -p '${wssserverpassword}' --socks5 127.0.0.1:24680 && testsocks5 -s 127.0.0.1:24680; joker stop \`joker list | grep brook | grep client | awk '{print \$1}'\`; echo; fi\n`;
+				}
+				if(kind == "socks5" && socks5ipv == "4"){
+					if(socks5username == ""){
+						s += `if [ -z \${SOCKS5SERVER4+x} ]; then echo; else printf "\\n\${ORANGE}Testing \$SOCKS5SERVER4 ...\${NC}\\n\\n" && testsocks5 -s \$SOCKS5SERVER4; echo; fi\n`;
+					}
+					if(socks5username != ""){
+						s += `if [ -z \${SOCKS5SERVER4+x} ]; then echo; else printf "\\n\${ORANGE}Testing \$SOCKS5SERVER4 ...\${NC}\\n\\n" && testsocks5 -s \$SOCKS5SERVER4 -u '${socks5username}' -p '${socks5password}'; echo; fi\n`;
+					}
+				}
+				if(kind == "socks5" && socks5ipv == "6"){
+					// https://github.com/brook-community/testsocks5/blob/master/testsocks5.js#L73
+					s += `if [ -z ${SOCKS5SERVER6+x} ]; then echo; else printf "\\n\${ORANGE}Currently does not support testing \$SOCKS5SERVER6\${NC}\\n\\n"; fi\n`;
+				}
+				doc += lang == "en" ? "- Please use the root user to execute the above commands, the command to switch to root is: sudo su\n" : "- 请使用root用户执行以上命令, 切换到root的命令是: sudo su\n";
+				doc += lang == "en" ? "- If there is a problem, restart the machine and then run the above commands again\n" : "- 如果有问题就重启机器后再运行以上命令\n";
 				doc += "\n";
-				doc += lang == "en" ? "- It is strongly recommended to read the official document https://txthinking.github.io/brook/\n" : "强烈建议阅读官方文档https://txthinking.github.io/brook/#/zh-cn/\n";
+				doc += lang == "en" ? "- It is strongly recommended to read the official document https://txthinking.github.io/brook/\n" : "- 强烈建议阅读官方文档 https://txthinking.github.io/brook/#/zh-cn/\n";
 				document.querySelector(`#${lang}_code_flex`).style.display='flex';
 				document.querySelector(`#${lang}_copy_flex`).style.display='flex';
 				document.querySelector(`#${lang}_doc_flex`).style.display='flex';
@@ -226,31 +338,27 @@
         </script>
     </head>
     <body style="background-color:#f0f2f5;">
-		<div id="en_nav">
-			<wl-nav fixed>
-				<div slot="left">
-					<h2>Brook server-side installation script</h2>
-				</div>
-				<div slot="right">
-					<wl-button flat inverted style="color:white;"><a href="https://github.com/txthinking/brook">Brook Github</a></wl-button>
-					<wl-button flat inverted style="color:white;"><a href="https://txthinking.github.io/brook/">Document</a></wl-button>
-					<wl-button flat inverted style="color:white;"><a href="https://github.com/brook-community">Brook Community Github</a></wl-button>
-				</div>
-			</wl-nav>
+		<div id="en_nav_flex" style="background-color:black;display:flex;flex-direction:row;justify-content:space-between;flex-wrap: wrap;padding:10px 20px;">
+			<div style="color:white;display:flex;flex-direction:row;align-items:center;justify-content:flex-start;flex-wrap: wrap;">
+				<h2>Brook server-side installation script</h2>
+			</div>
+			<div style="display:flex;flex-direction:row;justify-content:flex-start;align-items:center;flex-wrap: wrap;">
+				<wl-button flat inverted style="color:white;text-transform: none;"><a href="https://github.com/txthinking/brook">Brook Github</a></wl-button>
+				<wl-button flat inverted style="color:white;text-transform: none;"><a href="https://txthinking.github.io/brook/">Document</a></wl-button>
+				<wl-button flat inverted style="color:white;text-transform: none;"><a href="https://github.com/brook-community">Brook Community Github</a></wl-button>
+			</div>
 		</div>
-		<div id="zh_nav" style="display:none;">
-			<wl-nav fixed>
-				<div slot="left">
-					<h2>Brook服务端安装脚本</h2>
-				</div>
-				<div slot="right">
-					<wl-button flat inverted style="color:white;"><a href="https://github.com/txthinking/brook">Brook Github</a></wl-button>
-					<wl-button flat inverted style="color:white;"><a href="https://txthinking.github.io/brook/#/zh-cn/">官方文档</a></wl-button>
-					<wl-button flat inverted style="color:white;"><a href="https://github.com/brook-community">Brook Community Github</a></wl-button>
-				</div>
-			</wl-nav>
+		<div id="zh_nav_flex" style="background-color:black;display:none;flex-direction:row;justify-content:space-between;flex-wrap: wrap;padding:0 20px;">
+			<div style="color:white;display:flex;flex-direction:row;align-items:center;justify-content:flex-start;flex-wrap: wrap;">
+				<h2>Brook服务端安装脚本</h2>
+			</div>
+			<div style="display:flex;flex-direction:row;justify-content:flex-start;align-items:center;flex-wrap: wrap;">
+				<wl-button flat inverted style="color:white;text-transform: none;"><a href="https://github.com/txthinking/brook">Brook Github</a></wl-button>
+				<wl-button flat inverted style="color:white;text-transform: none;"><a href="https://txthinking.github.io/brook/#/zh-cn/">官方文档</a></wl-button>
+				<wl-button flat inverted style="color:white;text-transform: none;"><a href="https://github.com/brook-community">Brook Community Github</a></wl-button>
+			</div>
 		</div>
-        <div style="height:100px;"></div>
+        <div style="height:40px;"></div>
         <div style="display:flex;flex-direction:row;justify-content:center;">
             <wl-tab-group align="center">
                 <wl-tab checked id="en" onclick="changelang('en')">🇬🇧English</wl-tab>
@@ -258,9 +366,8 @@
             </wl-tab-group>
             <div></div>
         </div>
-        <div style="height:20px;"></div>
+        <div style="height:40px;"></div>
         <div id="en_flex" style="display:flex;flex-direction:column;">
-            <div style="height:20px;"></div>
             <div style="display:flex;flex-direction:row;justify-content:center;">
                 <wl-tab-group align="center">
                     <wl-tab checked id="en_ni" onclick="changei('en', 'ni')">Non-interactive</wl-tab>
@@ -304,6 +411,8 @@
 						</div>
 						<div style="display:none;flex-direction:column;" id="en_socks5_flex">
 							<div style="height:20px;"></div>
+							<wl-textfield label="IPv, example: 4 or 6" id="en_socks5_ipv" value="4"></wl-textfield>
+							<div style="height:20px;"></div>
 							<wl-textfield label="port, example: 9999" id="en_socks5_port"></wl-textfield>
 							<div style="height:20px;"></div>
 							<wl-textfield label="username, optional" id="en_socks5_username"></wl-textfield>
@@ -326,6 +435,12 @@
 				<div id="en_doc_flex" style="display:none;flex-direction:row;justify-content:center;">
 					<wl-card style="max-width:80%;display:flex;flex-direction:column;">
 						<wl-text id="en_doc" style="color:red;"></wl-text>
+					</wl-card>
+				</div>
+				<div style="height:100px;"></div>
+				<div style="display:flex;flex-direction:row;justify-content:center;">
+					<wl-card style="max-width:80%;display:flex;flex-direction:row;justify-content:center;">
+						<img style="width:100%;" src="./brookserverdemo.gif"/>
 					</wl-card>
 				</div>
 			</div>
@@ -354,7 +469,6 @@
         </div>
 
         <div id="zh_flex" style="display:none;flex-direction:column;">
-            <div style="height:20px;"></div>
             <div style="display:flex;flex-direction:row;justify-content:center;">
                 <wl-tab-group align="center">
                     <wl-tab checked id="zh_ni" onclick="changei('zh', 'ni')">非交互式</wl-tab>
@@ -398,6 +512,8 @@
 						</div>
 						<div style="display:none;flex-direction:column;" id="zh_socks5_flex">
 							<div style="height:20px;"></div>
+							<wl-textfield label="IPv, example: 4 or 6" id="zh_socks5_ipv" value="4"></wl-textfield>
+							<div style="height:20px;"></div>
 							<wl-textfield label="端口, 比如: 9999" id="zh_socks5_port"></wl-textfield>
 							<div style="height:20px;"></div>
 							<wl-textfield label="用户名, 可选" id="zh_socks5_username"></wl-textfield>
@@ -420,6 +536,12 @@
 				<div id="zh_doc_flex" style="display:none;flex-direction:row;justify-content:center;">
 					<wl-card style="max-width:80%;display:flex;flex-direction:column;">
 						<wl-text id="zh_doc" style="color:red;"></wl-text>
+					</wl-card>
+				</div>
+				<div style="height:100px;"></div>
+				<div style="display:flex;flex-direction:row;justify-content:center;">
+					<wl-card style="max-width:80%;display:flex;flex-direction:row;justify-content:center;">
+						<img style="width:100%;" src="./brookserverdemo.gif"/>
 					</wl-card>
 				</div>
 			</div>
@@ -448,38 +570,28 @@
         </div>
 
 		<div style="height:60px;"></div>
-		<div id="en_footer_flex" style="display:flex;flex-direction:row;background-color:white;justify-content:space-between;margin-top:auto;padding:30px;">
-			<div style="display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start;">
+		<div id="en_footer_flex" style="display:flex;flex-direction:row;background-color:white;justify-content:space-between;margin-top:auto;padding:60px 30px;">
+			<div style="display:flex;flex-direction:row;justify-content:space-around;align-items:flex-start;flex-wrap: wrap;">
 				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://github.com/txthinking/brook">Brook Github</a></wl-button>
 				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://txthinking.github.io/brook/">Document</a></wl-button>
 				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://talks.txthinking.com">Blog</a></wl-button>
 				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://www.youtube.com/channel/UC5j8-I5Y4lWo4KTa4_0Kx5A">Youtube</a></wl-button>
 				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://github.com/brook-community">Brook Community Github</a></wl-button>
-			</div>
-			<div style="display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start;">
 				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://github.com/txthinking/brook/discussions">Community</a></wl-button>
 				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://t.me/brookgroup">Telegram Group</a></wl-button>
 				<wl-button flat inverted style="color:black;text-transform: none;"><a href="Telegram Channel">Telegram Channel</a></wl-button>
-				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://github.com/txthinking/nami">Nami</a></wl-button>
-				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://github.com/txthinking/joker">Joker</a></wl-button>
-				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://twitter.com/txthinking">Twitter</a></wl-button>
 			</div>
 		</div>
 		<div id="zh_footer_flex" style="display:none;flex-direction:row;background-color:white;justify-content:space-between;margin-top:auto;padding:30px;">
-			<div style="display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start;">
+			<div style="display:flex;flex-direction:row;justify-content:space-around;align-items:flex-start;flex-wrap: wrap;">
 				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://github.com/txthinking/brook">Brook Github</a></wl-button>
 				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://txthinking.github.io/brook/">官方文档</a></wl-button>
 				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://talks.txthinking.com">博客</a></wl-button>
 				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://www.youtube.com/channel/UC5j8-I5Y4lWo4KTa4_0Kx5A">Youtube</a></wl-button>
 				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://github.com/brook-community">Brook Community Github</a></wl-button>
-			</div>
-			<div style="display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start;">
 				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://github.com/txthinking/brook/discussions">论坛</a></wl-button>
 				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://t.me/brookgroup">Telegram 群组</a></wl-button>
 				<wl-button flat inverted style="color:black;text-transform: none;"><a href="Telegram Channel">Telegram 频道</a></wl-button>
-				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://github.com/txthinking/nami">Nami</a></wl-button>
-				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://github.com/txthinking/joker">Joker</a></wl-button>
-				<wl-button flat inverted style="color:black;text-transform: none;"><a href="https://twitter.com/txthinking">Twitter</a></wl-button>
 			</div>
 		</div>
 
