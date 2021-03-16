@@ -323,7 +323,7 @@
 				}
 				if(kind == "socks5" && socks5ipv == "6"){
 					// https://github.com/brook-community/testsocks5/blob/master/testsocks5.js#L73
-					s += `if [ -z ${SOCKS5SERVER6+x} ]; then echo; else printf "\\n\${ORANGE}Currently does not support testing \$SOCKS5SERVER6\${NC}\\n\\n"; fi\n`;
+					s += `if [ -z \${SOCKS5SERVER6+x} ]; then echo; else printf "\\n\${ORANGE}Currently does not support testing \$SOCKS5SERVER6\${NC}\\n\\n"; fi\n`;
 				}
 				doc += lang == "en" ? "- Please use the root user to execute the above commands, the command to switch to root is: sudo su\n" : "- 请使用root用户执行以上命令, 切换到root的命令是: sudo su\n";
 				doc += lang == "en" ? "- If there is a problem, restart the machine and then run the above commands again\n" : "- 如果有问题就重启机器后再运行以上命令\n";
