@@ -217,6 +217,7 @@
 				s += "test $ERROR -eq 0 && nami install github.com/txthinking/brook\n";
 				s += "test $ERROR -eq 0 && nami install github.com/txthinking/joker\n";
 				s += "test $ERROR -eq 0 && nami install github.com/brook-community/testsocks5\n";
+				s += "test $ERROR -eq 0 && nami install github.com/brook-community/urlencode\n";
 				var doc = lang == "en" ? "Copy and paste directly into your terminal and press enter\n" : "复制后直接粘贴到你的终端回车即可\n";
 				doc += lang == "en" ? "The above commands are generated based on these documents and added some checks, if you look at the documentation, the actual commands are simpler\n" : "以上命令基于这几个文档生成并加了一些检查, 如果你看文档实际命令更简单\n";
 				doc += "\n";
@@ -226,8 +227,8 @@
 					s += `test \$ERROR -eq 0 && joker brook server --listen :${serverport} --password '${serverpassword}'\n`;
 					s += "test $ERROR -eq 0 && sleep 3\n";
 					s += "test $ERROR -eq 0 && joker list\n";
-					s += `s=\`curl -4 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && printf "\\n\${GREEN}brook server: \$s:${serverport}\${NC}\\n\\n" && export SERVER4=\$s:${serverport}; else printf "\\n\${RED}Can not find server public v4 IP\${NC}\\n\\n"; fi\n`;
-					s += `s=\`curl -6 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && printf "\\n\${GREEN}brook server: [\$s]:${serverport}\${NC}\\n\\n" && export SERVER6=[\$s]:${serverport}; else printf "\\n\${RED}Can not find server public v6 IP\${NC}\\n\\n"; fi\n`;
+                                s += `s=\`curl -4 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && printf "\\n\${GREEN}brook server: \$s:${serverport}\\npassword: ${serverpassword}\\n\\nbrook link: brook://%s\${NC}\\n\\n" \`urlencode "\$s:${serverport} ${serverpassword}"\` && export SERVER4=\$s:${serverport}; else printf "\\n\${RED}Can not find server public v4 IP\${NC}\\n\\n"; fi\n`;
+                                s += `s=\`curl -6 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && printf "\\n\${GREEN}brook server: [\$s]:${serverport}\\npassword: ${serverpassword}\\n\\nbrook link: brook://%s\${NC}\\n\\n" \`urlencode "[\$s]:${serverport} ${serverpassword}"\` && export SERVER6=[\$s]:${serverport}; else printf "\\n\${RED}Can not find server public v6 IP\${NC}\\n\\n"; fi\n`;
 					doc += lang == "en" ? "https://txthinking.github.io/brook/#/brook-server\n" : "https://txthinking.github.io/brook/#/zh-cn/brook-server\n";
 					doc += "\n";
 					doc += lang == "en" ? `- If there is a firewall, remember to allow TCP and UDP on port ${serverport}\n` : `- 如果有防火墙, 记得允许${serverport}端口的TCP和UDP协议\n`;
@@ -236,8 +237,8 @@
 					s += `test \$ERROR -eq 0 && joker brook wsserver --listen :${wsserverport} --password '${wsserverpassword}'\n`;
 					s += "test $ERROR -eq 0 && sleep 3\n";
 					s += "test $ERROR -eq 0 && joker list\n";
-					s += `s=\`curl -4 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && printf "\\n\${GREEN}brook wsserver: ws://\$s:${wsserverport}\${NC}\\n\\n" && export WSSERVER4=ws://\$s:${wsserverport}; else printf "\\n\${RED}Can not find server public v4 IP\${NC}\\n\\n"; fi\n`;
-					s += `s=\`curl -6 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && printf "\\n\${GREEN}brook wsserver: ws://[\$s]:${wsserverport}\${NC}\\n\\n" && export WSSERVER6=ws://[\$s]:${wsserverport}; else printf "\\n\${RED}Can not find server public v6 IP\${NC}\\n\\n"; fi\n`;
+                    s += `s=\`curl -4 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && printf "\\n\${GREEN}brook wsserver: ws://\$s:${wsserverport}\\npassword: ${wsserverpassword}\\n\\nbrook link: brook://%s\${NC}\\n\\n" \`urlencode "ws://\$s:${wsserverport} ${wsserverpassword}"\` && export WSSERVER4=ws://\$s:${wsserverport}; else printf "\\n\${RED}Can not find server public v4 IP\${NC}\\n\\n"; fi\n`;
+                    s += `s=\`curl -6 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && printf "\\n\${GREEN}brook wsserver: ws://[\$s]:${wsserverport}\\npassword: ${wsserverpassword}\\n\\nbrook link: brook://%s\${NC}\\n\\n" \`urlencode "ws://[\$s]:${wsserverport} ${wsserverpassword}"\` && export WSSERVER6=ws://[\$s]:${wsserverport}; else printf "\\n\${RED}Can not find server public v6 IP\${NC}\\n\\n"; fi\n`;
 					doc += lang == "en" ? "https://txthinking.github.io/brook/#/brook-wsserver\n" : "https://txthinking.github.io/brook/#/zh-cn/brook-wsserver\n";
 					doc += "\n";
 					doc += lang == "en" ? `- If there is a firewall, remember to allow TCP on port ${wsserverport}\n` : `- 如果有防火墙, 记得允许${wsserverport}端口的TCP协议\n`;
@@ -246,7 +247,7 @@
 					s += `test \$ERROR -eq 0 && joker brook wssserver --domain ${wssserverdomain} --password '${wssserverpassword}'\n`;
 					s += "test $ERROR -eq 0 && sleep 3\n";
 					s += "test $ERROR -eq 0 && joker list\n";
-					s += `test \$ERROR -eq 0 && printf "\\n\${GREEN}brook wssserver: wss://${wssserverdomain}:443\${NC}\\n\\n" && export WSSSERVER=wss://${wssserverdomain}:443\n`;
+                                s += `test \$ERROR -eq 0 && printf "\\n\${GREEN}brook wssserver: wss://${wssserverdomain}:443\\npassword: ${wssserverpassword}\\n\\nbrook link: brook://%s\${NC}\\n\\n" \`urlencode "wss://${wssserverdomain}:443 ${wssserverpassword}"\` && export WSSSERVER=wss://${wssserverdomain}:443\n`;
 					doc += lang == "en" ? "https://txthinking.github.io/brook/#/brook-wssserver\n" : "https://txthinking.github.io/brook/#/zh-cn/brook-wssserver\n";
 					doc += "\n";
 					doc += lang == "en" ? `- If there is a firewall, remember to allow TCP on port 80 and 443\n` : `- 如果有防火墙, 记得允许80和443端口的TCP协议\n`;
@@ -257,7 +258,7 @@
 						s += `s=\`curl -4 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && joker brook socks5 --socks5 \$s:${socks5port}; else printf "\\n\${RED}Can not find server public v4 IP\${NC}\\n\\n"; fi\n`;
 						s += "test $ERROR -eq 0 && sleep 3\n";
 						s += "test $ERROR -eq 0 && joker list\n";
-						s += `s=\`curl -4 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && printf "\\n\${GREEN}socks5 server: \$s:${socks5port}\${NC}\\n\\n" && export SOCKS5SERVER4=\$s:${socks5port}; else printf "\\n\${RED}Can not find server public v4 IP\${NC}\\n\\n"; fi\n`;
+                        s += `s=\`curl -4 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && printf "\\n\${GREEN}socks5 server: \$s:${socks5port}\\n\\nbrook link: brook://%s\${NC}\\n\\n" \`urlencode "socks5://\$s:${socks5port}"\` && export SOCKS5SERVER4=\$s:${socks5port}; else printf "\\n\${RED}Can not find server public v4 IP\${NC}\\n\\n"; fi\n`;
 						doc += lang == "en" ? "https://txthinking.github.io/brook/#/brook-socks5\n" : "https://txthinking.github.io/brook/#/zh-cn/brook-socks5\n";
 						doc += "\n";
 						doc += lang == "en" ? `- If there is a firewall, remember to allow TCP and UDP on port ${socks5port}\n` : `- 如果有防火墙, 记得允许${socks5port}端口的TCP和UDP协议\n`;
@@ -266,7 +267,7 @@
 						s += `s=\`curl -4 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && joker brook socks5 --socks5 \$s:${socks5port} --username '${socks5username}' --password '${socks5password}'; else printf "\\n\${RED}Can not find server public v4 IP\${NC}\\n\\n"; fi\n`;
 						s += "test $ERROR -eq 0 && sleep 3\n";
 						s += "test $ERROR -eq 0 && joker list\n";
-						s += `s=\`curl -4 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && printf "\\n\${GREEN}socks5 server: \$s:${socks5port}\${NC}\\n\\n" && export SOCKS5SERVER4=\$s:${socks5port}; else printf "\\n\${RED}Can not find server public v4 IP\${NC}\\n\\n"; fi\n`;
+                        s += `s=\`curl -4 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && printf "\\n\${GREEN}socks5 server: \$s:${socks5port}\\nusername: ${socks5username}\\npassword: ${socks5password}\\n\\nbrook link: brook://%s\${NC}\\n\\n" \`urlencode "socks5://\$s:${socks5port} ${socks5username} ${socks5password}"\` && export SOCKS5SERVER4=\$s:${socks5port}; else printf "\\n\${RED}Can not find server public v4 IP\${NC}\\n\\n"; fi\n`;
 						doc += lang == "en" ? "https://txthinking.github.io/brook/#/brook-socks5\n" : "https://txthinking.github.io/brook/#/zh-cn/brook-socks5\n";
 						doc += "\n";
 						doc += lang == "en" ? `- If there is a firewall, remember to allow TCP and UDP on port ${socks5port}\n` : `- 如果有防火墙, 记得允许${socks5port}端口的TCP和UDP协议\n`;
@@ -277,7 +278,7 @@
 						s += `s=\`curl -6 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && joker brook socks5 --socks5 [\$s]:${socks5port}; else printf "\\n\${RED}Can not find server public v6 IP\${NC}\\n\\n"; fi\n`;
 						s += "test $ERROR -eq 0 && sleep 3\n";
 						s += "test $ERROR -eq 0 && joker list\n";
-						s += `s=\`curl -6 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && printf "\\n\${GREEN}socks5 server: [\$s]:${socks5port}\${NC}\\n\\n" && export SOCKS5SERVER6=[\$s]:${socks5port}; else printf "\\n\${RED}Can not find server public v6 IP\${NC}\\n\\n"; fi\n`;
+                        s += `s=\`curl -6 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && printf "\\n\${GREEN}socks5 server: [\$s]:${socks5port}\\n\\nbrook link: brook://%s\${NC}\\n\\n" \`urlencode "socks5://[\$s]:${socks5port}"\` && export SOCKS5SERVER6=[\$s]:${socks5port}; else printf "\\n\${RED}Can not find server public v6 IP\${NC}\\n\\n"; fi\n`;
 						doc += lang == "en" ? "https://txthinking.github.io/brook/#/brook-socks5\n" : "https://txthinking.github.io/brook/#/zh-cn/brook-socks5\n";
 						doc += "\n";
 						doc += lang == "en" ? `- If there is a firewall, remember to allow TCP and UDP on port ${socks5port}\n` : `- 如果有防火墙, 记得允许${socks5port}端口的TCP和UDP协议\n`;
@@ -286,7 +287,7 @@
 						s += `s=\`curl -6 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && joker brook socks5 --socks5 [\$s]:${socks5port} --username '${socks5username}' --password '${socks5password}'; else printf "\\n\${RED}Can not find server public v6 IP\${NC}\\n\\n"; fi\n`;
 						s += "test $ERROR -eq 0 && sleep 3\n";
 						s += "test $ERROR -eq 0 && joker list\n";
-						s += `s=\`curl -6 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && printf "\\n\${GREEN}socks5 server: [\$s]:${socks5port}\${NC}\\n\\n" && export SOCKS5SERVER6=[\$s]:${socks5port}; else printf "\\n\${RED}Can not find server public v6 IP\${NC}\\n\\n"; fi\n`;
+                                    s += `s=\`curl -6 ip.sb 2>/dev/null\`; if [ "\$s" != '' ]; then test \$ERROR -eq 0 && printf "\\n\${GREEN}socks5 server: [\$s]:${socks5port}\\nusername: ${socks5username}\\npassword: ${socks5password}\\n\\nbrook link: brook://%s\${NC}\\n\\n" \`urlencode "socks5://[\$s]:${socks5port} ${socks5username} ${socks5password}"\` && export SOCKS5SERVER6=[\$s]:${socks5port}; else printf "\\n\${RED}Can not find server public v6 IP\${NC}\\n\\n"; fi\n`;
 						doc += lang == "en" ? "https://txthinking.github.io/brook/#/brook-socks5\n" : "https://txthinking.github.io/brook/#/zh-cn/brook-socks5\n";
 						doc += "\n";
 						doc += lang == "en" ? `- If there is a firewall, remember to allow TCP and UDP on port ${socks5port}\n` : `- 如果有防火墙, 记得允许${socks5port}端口的TCP和UDP协议\n`;
