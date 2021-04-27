@@ -221,7 +221,7 @@
 						s += `if [ "\$ip6" != "" -a "\$ip6" != "\$sip6" ]; then printf "\\n\${RED}请先解析域名到你的服务器IP\${NC}\\n\\n" && export ERROR=1; fi\n`;
 					}
 				}
-				s += "test $ERROR -eq 0 && curl -L https://git.io/getnami | bash && sleep 6 && exec -l $SHELL\n"
+				s += "test $ERROR -eq 0 && source <(curl -L https://git.io/getnami)\n"
 				s += "test $ERROR -eq 0 && nami install github.com/txthinking/brook\n";
 				s += "test $ERROR -eq 0 && nami install github.com/txthinking/joker\n";
 				s += "test $ERROR -eq 0 && nami install github.com/brook-community/testsocks5\n";
