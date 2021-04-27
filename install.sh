@@ -74,7 +74,7 @@ get_ip() {
 }
 
 install_nami(){
-    curl -sL https://git.io/getnami | bash > /dev/null 2>&1 && sleep 6 && export PATH=$HOME/.nami/bin:$PATH && clear
+    source <(curl -L https://git.io/getnami) && clear
     if [[ ! $(command -v nami) ]];
     then
         clear
@@ -108,7 +108,7 @@ install_brook(){
 
 welcome(){
     clear
-    echo "Version: v20210221"
+    echo "Version: v20210427"
     echo "Please wait..."
     echo "请耐心等待。。。"
 }
@@ -118,9 +118,26 @@ check_root(){
 }
 
 install(){
-    install_nami
-    install_joker
-    install_brook
+    if [[ $(command -v nami) ]];
+    then
+        nami upgrade github.com/txthinking/nami
+    else
+        install_nami
+    fi
+    
+    if [[ $(command -v joker) ]];
+    then
+        nami upgrade github.com/txthinking/joker
+    else
+        install_joker
+    fi
+    
+    if [[ $(command -v brook) ]];
+    then
+        nami upgrade github.com/txthinking/brook
+    else
+        install_brook
+    fi
 }
 
 run_brook(){
@@ -211,3 +228,40 @@ get_ip
 [[ "$protocol" ]] || get_protocol
 run_brook
 show_status
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
