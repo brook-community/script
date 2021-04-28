@@ -104,12 +104,12 @@ install_nami(){
 
 install_joker(){
     nami install github.com/txthinking/joker
-    [[ ! $(command -v joker) ]] || fail_to_install joker
+    [[ $(command -v joker) ]] || fail_to_install joker
 }
 
 install_brook(){
     nami install github.com/txthinking/brook
-    [[ ! $(command -v brook) ]] || fail_to_install brook
+    [[ $(command -v brook) ]] || fail_to_install brook
 }
 
 welcome(){
@@ -124,21 +124,21 @@ check_root(){
 }
 
 install(){
-    if [[ $(command -v nami) ]];
+    if [[ -f ~/.nami/bin/nami ]];
     then
         nami upgrade github.com/txthinking/nami
     else
         install_nami
     fi
     
-    if [[ $(command -v joker) ]];
+    if [[ -f ~/.nami/bin/joker ]];
     then
         nami upgrade github.com/txthinking/joker
     else
         install_joker
     fi
     
-    if [[ $(command -v brook) ]];
+    if [[ -f ~/.nami/bin/brook ]];
     then
         nami upgrade github.com/txthinking/brook
     else
