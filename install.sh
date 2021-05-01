@@ -209,7 +209,7 @@ show_status(){
     echo
 }
 
-
+PATH=$HOME/.nami/bin:$PATH
 protocol=''
 port=''
 password=''
